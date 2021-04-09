@@ -4,5 +4,5 @@ C#'da panel kullanılarak yapılan bir uygulamadır. Mail almayı ve yazmayı ko
 
 <img src="https://github.com/Oyuasx/Mailbox/blob/master/İmages/mailbox.jpg">
 
-#Mail_database.sql
+# Mail_database.sql
 
