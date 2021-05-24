@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System.Data; 
+using System.Data;
 using System.Data.SqlClient;
 
 using MailKit.Net.Smtp;
@@ -21,15 +21,7 @@ namespace mail
     class DataAccess
     {
         public SqlConnection con;
-        string durum, convert;
         bool gonder;
-        List<mail_get_user> dondur = new List<mail_get_user>();
-        List<string> baslik = new List<string>();
-        List<string> icerik = new List<string>();
-        List<string> yollayan = new List<string>();
-        List<DateTimeOffset> tarih = new List<DateTimeOffset>();
-        int mail_alan_kisi;
-
         public DataAccess()
         {
             Connection();
@@ -42,6 +34,7 @@ namespace mail
 
         public string bilgisayar_deger_kontrol(string IPV4, string pc_user_name)         //şuan ki pc, ipv4 nin değerlerini alır ve bu değerlerle eşleşem mail varmı diye kontrol eder.
         {
+            string durum;
             using (SqlCommand cmd = new SqlCommand())
             {
                 cmd.Connection = con;
@@ -287,26 +280,28 @@ namespace mail
 
         }
 
+        //Form3 kısmı
 
+        List<mail_get_user> dondur = new List<mail_get_user>();
+        static List<string> baslik = new List<string>();
+        static List<string> icerik = new List<string>();
+        static List<string> yollayan = new List<string>();
+        static List<DateTimeOffset> tarih = new List<DateTimeOffset>();
+        static int toplam_mesaj;
 
-        //form3 kısmı  -hatalı kısımlar var bakçam
-
-        public void form3_db_ekleme_islemler()   //false dönerse db ile maildeki değerler farklı olduğundan mail indirme işlemi olcak
+        public void form3_db_ekleme_islemler()
         {
-            List<string> baslik = new List<string>();
-            List<string> icerik = new List<string>();
-            List<string> yollayan = new List<string>();
-            List<DateTimeOffset> tarih = new List<DateTimeOffset>();
             using (var client = new ImapClient())
             {
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                 client.Connect("imap.gmail.com", 993, SecureSocketOptions.SslOnConnect);
-
+                
                 client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
 
                 var inbox = client.Inbox;
                 inbox.Open(FolderAccess.ReadOnly);
-                int toplam_mesaj = inbox.Count;
+                toplam_mesaj = inbox.Count;
+                string convert;
                 foreach (var summary in inbox.Fetch(0, -1, MessageSummaryItems.Full))
                 {
                     baslik.Add(summary.Envelope.Subject);
@@ -314,24 +309,20 @@ namespace mail
                     convert = Convert.ToString(summary.Envelope.Sender);
                     yollayan.Add(convert);
                 }
-
                 foreach (var summary in inbox.Fetch(0, -1, MessageSummaryItems.UniqueId | MessageSummaryItems.BodyStructure))
                 {
-                    if (summary.TextBody != null)
+                    if (summary.HtmlBody != null)
+                    {
+                        var text = (TextPart)inbox.GetBodyPart(summary.UniqueId, summary.HtmlBody);
+                        icerik.Add(text.Text);
+                    }
+                    else if (summary.TextBody != null)
                     {
                         var text = (TextPart)inbox.GetBodyPart(summary.UniqueId, summary.TextBody);
                         icerik.Add(text.Text);
                     }
-                    if (summary.HtmlBody != null)
-                    {
-                        // this will download *just* the text/html part
-                        var html = (TextPart)inbox.GetBodyPart(summary.UniqueId, summary.HtmlBody);
-                        icerik.Add(html.Text);
-                    }
                 }
-
                 //db işlemleri
-
                 for (int i = 0; i < toplam_mesaj; i++)
                 {
                     using (SqlCommand cmd = new SqlCommand())
@@ -347,11 +338,9 @@ namespace mail
                         if (dr.Read())
                         {
                             dr.Close();
-                            cmd.Parameters.Clear();
                         }
                         else
                         {
-                            cmd.Parameters.Clear();
                             dr.Close();
                             using (SqlCommand cmd2 = new SqlCommand())
                             {
@@ -362,6 +351,66 @@ namespace mail
                                 cmd2.Parameters.AddWithValue("@alınan_mail_konu", baslik[i]);
                                 cmd2.Parameters.AddWithValue("@mail_alma_tarhi", tarih[i]);
                                 cmd2.Parameters.AddWithValue("@alınan_mail_icerik", icerik[i]);
+                                cmd.CommandType = CommandType.Text;
+                                cmd2.ExecuteNonQuery();
+                                cmd2.Parameters.Clear();
+                            }
+                        }
+                        con.Close();
+                    }
+                }
+                int db_toplam_mesaj;
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.Connection = con;
+                    con.Open();
+                    cmd.CommandText = "Select count(alan_kisi_no) from mail_get_user";
+                    cmd.CommandType = CommandType.Text;
+                    db_toplam_mesaj = Convert.ToInt32(cmd.ExecuteScalar());
+                    con.Close();
+                }
+                if (toplam_mesaj < db_toplam_mesaj)
+                {
+                    List<int> degertut_id = new List<int>();
+                    string degertut1;
+                    DateTimeOffset degertut2;
+                    int degertut3;
+                    bool esittir = false;
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.Connection = con;
+                        con.Open();
+                        cmd.CommandText = "SELECT alınan_mail_konu,mail_alma_tarhi,id from mail_get_user where alan_kisi_no=@alan_kisi_no";
+                        cmd.Parameters.AddWithValue("@alan_kisi_no", login_user.Instance.id); ;
+                        cmd.CommandType = CommandType.Text;
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        while (dr.Read())
+                        {
+                            degertut1 = dr["alınan_mail_konu"].ToString();
+                            degertut2 = (DateTimeOffset)dr["mail_alma_tarhi"];
+                            degertut3 = (Int32)dr["id"];
+                            for (int i = 0; i < toplam_mesaj; i++)
+                            {
+                                if (degertut1 == baslik[i] && degertut2 == tarih[i])
+                                {
+                                    esittir = true;
+                                }
+                            }
+                            if (esittir != true)
+                            {
+                                degertut_id.Add(degertut3);
+                            }
+                        }
+                        dr.Close();
+                        using (SqlCommand cmd2 = new SqlCommand())
+                        {
+                            cmd2.Connection = con;
+                            foreach (int tut in degertut_id)
+                            {
+                                cmd2.CommandText = "Delete from mail_get_user where id=@id and alan_kisi_no=@alan_kisi_no";
+                                cmd2.Parameters.AddWithValue("@id", tut);
+                                cmd2.Parameters.AddWithValue("@alan_kisi_no", login_user.Instance.id); ;
+                                cmd2.CommandType = CommandType.Text;
                                 cmd2.ExecuteNonQuery();
                                 cmd2.Parameters.Clear();
                             }
@@ -371,39 +420,70 @@ namespace mail
                 }
                 client.Disconnect(true);
             }
-
         }
-
-
-
-
-        public List<mail_get_user> form3_db_cekme_islemler_baslik()
+        public void form3_secilen_degeri_sil(int donen_id, string donen_konu, DateTimeOffset donen_tarih)
         {
-            mail_get_user maildb = new mail_get_user();
+            using (var client = new ImapClient())
+            {
+                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                client.Connect("imap.gmail.com", 993, SecureSocketOptions.SslOnConnect);
+                client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadWrite);
+                for (int i = 0; i < toplam_mesaj; i++)
+                {
+                    if (donen_konu == baslik[i] && donen_tarih == tarih[i])
+                    {
+                        var matchFolder = client.GetFolder(SpecialFolder.Trash);
+                        if (matchFolder != null)
+                            inbox.MoveTo(i, matchFolder);
+                        break;
+                        //inbox.AddFlags(i, MessageFlags.Deleted, false);  silmek için
+                    }
+                }
+                inbox.Expunge();
+                inbox.Close();
+                client.Disconnect(true);
+            }
             using (SqlCommand cmd = new SqlCommand())
             {
                 cmd.Connection = con;
                 con.Open();
-                cmd.CommandText = "SELECT alınan_mail_konu,mail_alma_tarhi,yollayan_kisi from mail_get_user where alan_kisi_no=@alan_kisi_no";
+                cmd.CommandText = "Delete from mail_get_user where id=@id and alan_kisi_no=@alan_kisi_no";
+                cmd.Parameters.AddWithValue("@id", donen_id);
+                cmd.Parameters.AddWithValue("@alan_kisi_no", login_user.Instance.id); ;
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+        }
+        public List<mail_get_user> form3_db_cekme_islemler()
+        {
+            using (SqlCommand cmd = new SqlCommand())
+            {
+                cmd.Connection = con;
+                con.Open();
+                cmd.CommandText = "SELECT alınan_mail_konu,mail_alma_tarhi,yollayan_kisi,id,alınan_mail_icerik from mail_get_user where alan_kisi_no=@alan_kisi_no order by mail_alma_tarhi DESC";
                 cmd.Parameters.AddWithValue("@alan_kisi_no", login_user.Instance.id); ;
                 cmd.CommandType = CommandType.Text;
                 SqlDataReader dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
-                    maildb.alan_kisi_no = mail_alan_kisi;
-                    maildb.alınan_mail_konu = dr["alınan_mail_konu"].ToString();
-                    maildb.yollayan_kisi = dr["yollayan_kisi"].ToString();
-                    maildb.mail_alma_tarhi = (DateTimeOffset)dr["mail_alma_tarhi"];
-                    dondur.Add(maildb);
+                    dondur.Add(new mail_get_user
+                    {
+                        id = (Int32)dr["id"],
+                        alan_kisi_no = login_user.Instance.id,
+                        yollayan_kisi = dr["yollayan_kisi"].ToString(),
+                        mail_alma_tarhi = (DateTimeOffset)dr["mail_alma_tarhi"],
+                        alınan_mail_konu = dr["alınan_mail_konu"].ToString(),
+                        alınan_mail_icerik = dr["alınan_mail_icerik"].ToString(),
+                    });
                 }
                 dr.Close();
+                con.Close();
             }
-            con.Close();
             return dondur;
         }
-
-
-
 
 
 
@@ -420,7 +500,10 @@ namespace mail
                 message.To.Add(MailboxAddress.Parse(mail1.yolladıgımız_kisi));
                 message.Subject = mail1.gonderilen_mail_konu;
 
-                builder.Attachments.Add(@"" +mail1.gonderilen_mail_dosyalar);
+                if (mail1.gonderilen_mail_dosyalar != "")
+                {
+                    builder.Attachments.Add(@"" + mail1.gonderilen_mail_dosyalar);
+                }
 
                 message.Body = builder.ToMessageBody();
 
@@ -441,23 +524,42 @@ namespace mail
             }
             if (gonder == true)
             {
+                byte[] bytes;
                 DateTimeOffset dateTime = DateTimeOffset.Now;
-                byte[] bytes = System.IO.File.ReadAllBytes(mail1.gonderilen_mail_dosyalar);           //yükleidğimiz dosyayı byte'a dönüştüyyor ki db ye kaydedebilelim.
-                using (SqlCommand cmd = new SqlCommand())
+                if (mail1.gonderilen_mail_dosyalar != "")
                 {
-                    con.Open();
-                    cmd.Connection = con;
-                    cmd.CommandText = "insert into mail_send_user(yollayan_kisi_no,yolladıgımız_kisi,mail_yollama_tarhi,gonderilen_mail_konu,gonderilen_mail_icerik,gonderilen_mail_dosyalar) values (@yollayan_kisi_no, @yolladıgımız_kisi,@mail_yollama_tarhi ,@gonderilen_mail_konu ,@gonderilen_mail_icerik, @gonderilen_mail_dosyalar)";
-                    cmd.Parameters.AddWithValue("@yollayan_kisi_no", mail1.yollayan_kisi_no);
-                    cmd.Parameters.AddWithValue("@yolladıgımız_kisi", mail1.yolladıgımız_kisi);
-                    cmd.Parameters.AddWithValue("@mail_yollama_tarhi", dateTime);
-                    cmd.Parameters.AddWithValue("@gonderilen_mail_konu", mail1.gonderilen_mail_konu);
-                    cmd.Parameters.AddWithValue("@gonderilen_mail_icerik", mail1.gonderilen_mail_icerik);
-                    cmd.Parameters.AddWithValue("@gonderilen_mail_dosyalar", bytes);
-                    cmd.ExecuteNonQuery();
-                    cmd.Parameters.Clear();
-                    con.Close();
+                    bytes = System.IO.File.ReadAllBytes(mail1.gonderilen_mail_dosyalar);
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        con.Open();
+                        cmd.Connection = con;
+                        cmd.CommandText = "insert into mail_send_user(yollayan_kisi_no,yolladıgımız_kisi,mail_yollama_tarhi,gonderilen_mail_konu,gonderilen_mail_icerik,gonderilen_mail_dosyalar) values (@yollayan_kisi_no, @yolladıgımız_kisi,@mail_yollama_tarhi ,@gonderilen_mail_konu ,@gonderilen_mail_icerik, @gonderilen_mail_dosyalar)";
+                        cmd.Parameters.AddWithValue("@yollayan_kisi_no", mail1.yollayan_kisi_no);
+                        cmd.Parameters.AddWithValue("@yolladıgımız_kisi", mail1.yolladıgımız_kisi);
+                        cmd.Parameters.AddWithValue("@mail_yollama_tarhi", dateTime);
+                        cmd.Parameters.AddWithValue("@gonderilen_mail_konu", mail1.gonderilen_mail_konu);
+                        cmd.Parameters.AddWithValue("@gonderilen_mail_icerik", mail1.gonderilen_mail_icerik);
+                        cmd.Parameters.AddWithValue("@gonderilen_mail_dosyalar", bytes);
+                        cmd.ExecuteNonQuery();
+                        cmd.Parameters.Clear();
+                        con.Close();
+                    }
                 }
+                else
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        con.Open();
+                        cmd.Connection = con;
+                        cmd.CommandText = "insert into mail_send_user(yollayan_kisi_no,yolladıgımız_kisi,mail_yollama_tarhi,gonderilen_mail_konu,gonderilen_mail_icerik) values (@yollayan_kisi_no, @yolladıgımız_kisi,@mail_yollama_tarhi ,@gonderilen_mail_konu ,@gonderilen_mail_icerik)";
+                        cmd.Parameters.AddWithValue("@yollayan_kisi_no", mail1.yollayan_kisi_no);
+                        cmd.Parameters.AddWithValue("@yolladıgımız_kisi", mail1.yolladıgımız_kisi);
+                        cmd.Parameters.AddWithValue("@mail_yollama_tarhi", dateTime);
+                        cmd.Parameters.AddWithValue("@gonderilen_mail_konu", mail1.gonderilen_mail_konu);
+                        cmd.Parameters.AddWithValue("@gonderilen_mail_icerik", mail1.gonderilen_mail_icerik);
+                        cmd.ExecuteNonQuery();
+                        cmd.Parameters.Clear();
+                        con.Close();
+                    }
                 return true;
             }
             else

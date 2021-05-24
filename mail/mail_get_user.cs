@@ -8,6 +8,7 @@ namespace mail
 {
     public class mail_get_user
     {
+        public int id {get; set; }
         public int alan_kisi_no { get; set; }
         public string yollayan_kisi { get; set; }
         public DateTimeOffset mail_alma_tarhi { get; set; }
@@ -19,7 +20,7 @@ namespace mail
         {
             get
             {
-                return $"{alınan_mail_konu}-/-{yollayan_kisi}-{mail_alma_tarhi}";
+                return $"{alınan_mail_konu}   -/-  {yollayan_kisi}   -   {mail_alma_tarhi}";
             }
         }
 

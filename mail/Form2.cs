@@ -84,14 +84,6 @@ namespace mail
                         {
                             MessageBox.Show("Güvenlik Doğrulandı!", "Güvenlik");
                             this.Close();
-                            try
-                            {
-                                kp2.form3_db_ekleme_islemler();
-                            }
-                            catch(Exception hy)
-                            {
-                                MessageBox.Show(""+hy);
-                            }
                             sayfa3.Show();
                         }
                     }

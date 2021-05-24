@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarkupConverter;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -61,7 +62,7 @@ namespace mail
 
         private void Form4_Load(object sender, EventArgs e)
         {
-
+            mail1.gonderilen_mail_dosyalar = "";
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -75,20 +76,32 @@ namespace mail
             }
         }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+            label3.Text = "";
+            mail1.gonderilen_mail_dosyalar = "";
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             mail1.yollayan_kisi_no = login_user.Instance.id;
             mail1.yolladıgımız_kisi = textBox1.Text;
             mail1.gonderilen_mail_konu = textBox2.Text;
-            mail1.gonderilen_mail_icerik = richTextBox1.Text;
-
+            string text;
+            try
+            {
+                IMarkupConverter markupConverter = new MarkupConverter.MarkupConverter();
+                text = markupConverter.ConvertRtfToHtml(richTextBox1.Rtf);
+            }
+            catch(Exception)
+            {
+                text = richTextBox1.Text;
+            }
+            mail1.gonderilen_mail_icerik = text;
             if (kp4.form4_mail_gonderme(mail1) == true)
                 MessageBox.Show("Mesaj Gönderildi!");
             else
                 MessageBox.Show("Mesaj Gönderilemedi! -Hata");
-
-
-
         }
     }
 }

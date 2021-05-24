@@ -29,6 +29,8 @@ namespace mail
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            textBox2.UseSystemPasswordChar = true;
+            textBox3.UseSystemPasswordChar = true;
             try // database bağlantısı kontrolü
             {
                 kp1.Connection();
@@ -123,6 +125,21 @@ namespace mail
                 button1.PerformClick();
             }
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                textBox2.UseSystemPasswordChar = false;
+                textBox3.UseSystemPasswordChar = false;
+            }
+            else
+            {
+                textBox2.UseSystemPasswordChar = true;
+                textBox3.UseSystemPasswordChar = true;
+            }
+        }
+
         private void button3_Click(object sender, EventArgs e)
         {
             DialogResult dialogResult = MessageBox.Show("Çıkış Yapmak İstediğinize Emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
