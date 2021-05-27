@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace mail
 {
-    class login_user
+    public class login_user
     {
         public int id { get; set; }
         public string Eposta { get; set; }
@@ -15,6 +15,6 @@ namespace mail
         public string pc_user_name { get; set; }
 
         public login_user() { }
-        public static readonly login_user Instance = new login_user();
+        public static login_user Instance = new login_user();
     }
 }

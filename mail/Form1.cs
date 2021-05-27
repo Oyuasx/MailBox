@@ -22,6 +22,7 @@ namespace mail
         bool hata_varmı = false, cıkıs;
         Form2 sayfa2 = new Form2();
         Form3 sayfa3 = new Form3();
+
         public Form1()
         {
             InitializeComponent();
@@ -113,18 +114,6 @@ namespace mail
 
             }
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Giriş İşlemi Başlatılıyor...");
-            işlemler();
-        }
-        private void Form1_KeyDown(object sender, KeyEventArgs e)       //enter'a basıldığında giriş yapar.
-        {
-            if(e.KeyCode == Keys.Enter)
-            {
-                button1.PerformClick();
-            }
-        }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
@@ -140,12 +129,26 @@ namespace mail
             }
         }
 
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                button1.PerformClick();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Giriş İşlemi Başlatılıyor...");
+            işlemler();
+        }
+
         private void button3_Click(object sender, EventArgs e)
         {
             DialogResult dialogResult = MessageBox.Show("Çıkış Yapmak İstediğinize Emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
-                cıkıs = true;   //diablog içinde çıkış yapınca hata veriyor(sanırsam dialogu kapatmaya çalışıyor.)
+                cıkıs = true; 
             }
             if (cıkıs == true)
                 Environment.Exit(1);
@@ -171,6 +174,5 @@ namespace mail
                 this.SetDesktopLocation(MousePosition.X - mouse_x, MousePosition.Y - mouse_y);
             }
         }
-
     }
 }

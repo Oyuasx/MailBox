@@ -12,6 +12,5 @@ namespace mail
         public string yolladıgımız_kisi { get; set; }
         public string gonderilen_mail_konu { get; set; }
         public string gonderilen_mail_icerik { get; set; }
-        public string gonderilen_mail_dosyalar { get; set; }        //hatalı olabilir
     }
 }

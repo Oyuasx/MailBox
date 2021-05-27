@@ -244,23 +244,29 @@ namespace mail
             {
                 MessageBox.Show("" + hata);
             }
-
-            if (htmlkontrol == true)
+            if (checkBox1.Checked != true)
             {
-                try
+                if (htmlkontrol == true)
                 {
-                    IMarkupConverter markupConverter = new MarkupConverter.MarkupConverter();
-                    string text = markupConverter.ConvertHtmlToRtf(dgr_al[dizi].alınan_mail_icerik);
-                    richTextBox1.Rtf = text;
+                    try
+                    {
+                        IMarkupConverter markupConverter = new MarkupConverter.MarkupConverter();
+                        string text = markupConverter.ConvertHtmlToRtf(dgr_al[dizi].alınan_mail_icerik);
+                        richTextBox1.Rtf = text;
+                    }
+                    catch (Exception)
+                    {
+                        richTextBox1.Text = $"{ConvertHtmlToText(dgr_al[dizi].alınan_mail_icerik)}";
+                    }
                 }
-                catch (Exception)
+                else
                 {
-                    richTextBox1.Text = $"{ConvertHtmlToText(dgr_al[dizi].alınan_mail_icerik)}";
+                    richTextBox1.Text = $"{dgr_al[dizi].alınan_mail_icerik}";
                 }
             }
             else
             {
-                richTextBox1.Text = $"{dgr_al[dizi].alınan_mail_icerik}";
+                richTextBox1.Text = $"{ConvertHtmlToText(dgr_al[dizi].alınan_mail_icerik)}";
             }
         }
 
@@ -297,6 +303,29 @@ namespace mail
         {
             System.Diagnostics.Process.Start(e.LinkText);
         }
+
+
+
+
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            List<mail_get_user> results = dgr_al.FindAll(x => x.tam_deger.Contains(textBox1.Text));
+
+            if(textBox1.Text == "")
+            {
+                listBox2.DataSource = dgr_al;
+                listBox2.DisplayMember = "tam_deger";
+            }
+            else
+            {
+                listBox2.DataSource = results;
+                listBox2.DisplayMember = "tam_deger";
+            }
+        }
+
+
+
 
         private void button4_Click(object sender, EventArgs e)
         {

@@ -15,10 +15,11 @@ namespace mail
     public partial class Form2 : Form
     {
         int sayac = 30;
-        int rndm_tutan_deger;
         bool cıkıs;
         Form3 sayfa3 = new Form3();
         DataAccess kp2 = new DataAccess();
+
+        int rndm_tutan_deger;
         public int random_fonksiyon()
         {
             Random random = new Random();
@@ -122,6 +123,14 @@ namespace mail
         private void pictureBox2_MouseUp(object sender, MouseEventArgs e)
         {
             move = false;
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                button1.PerformClick();
+            }
         }
 
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
