@@ -40,6 +40,7 @@ namespace mail
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.listBox1 = new System.Windows.Forms.ListBox();
+            this.button6 = new mail.UserControl2();
             this.button5 = new mail.UserControl2();
             this.button7 = new mail.UserControl2();
             this.button2 = new mail.UserControl2();
@@ -136,6 +137,25 @@ namespace mail
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(245, 104);
             this.listBox1.TabIndex = 39;
+            // 
+            // button6
+            // 
+            this.button6.BorderColor = System.Drawing.Color.Black;
+            this.button6.ButtonColor = System.Drawing.Color.SkyBlue;
+            this.button6.FlatAppearance.BorderSize = 0;
+            this.button6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.button6.Location = new System.Drawing.Point(794, 313);
+            this.button6.Name = "button6";
+            this.button6.OnHoverBorderColor = System.Drawing.Color.Navy;
+            this.button6.OnHoverButtonColor = System.Drawing.Color.DeepSkyBlue;
+            this.button6.OnHoverTextColor = System.Drawing.Color.Navy;
+            this.button6.Size = new System.Drawing.Size(174, 38);
+            this.button6.TabIndex = 41;
+            this.button6.Text = "Metine Resim Ekle";
+            this.button6.TextColor = System.Drawing.Color.Navy;
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button5
             // 
@@ -262,6 +282,7 @@ namespace mail
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DeepSkyBlue;
             this.ClientSize = new System.Drawing.Size(1052, 575);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button7);
@@ -305,5 +326,6 @@ namespace mail
         private UserControl2 button7;
         private UserControl2 button5;
         private System.Windows.Forms.ListBox listBox1;
+        private UserControl2 button6;
     }
 }

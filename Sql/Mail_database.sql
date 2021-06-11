@@ -8,7 +8,7 @@ IPV4 varchar(40) NOT NULL,
 pc_user_name varchar(40) NOT NULL,
 tarih datetime NOT NULL DEFAULT GETDATE(),
 )
-
+/* çöp kutusu gönderilenler kutusu iþaretliler kutusu vb için kullnýlacak...
 
 create table mail_send_user(
 id int PRIMARY KEY IDENTITY(1,1),
@@ -25,7 +25,7 @@ gonderilen_mail_no int NOT NULL,
 gonderilen_mail_dosyalar varbinary(max) NULL,
 )
 
-
+*/
 
 create table mail_get_user(
 id int PRIMARY KEY IDENTITY(1,1),
@@ -49,4 +49,3 @@ select * from mail_get_user
 
 select * from mail_send_user_dosyalar
 select * from mail_get_user_dosyalar
-
