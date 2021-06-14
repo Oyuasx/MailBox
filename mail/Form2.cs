@@ -7,8 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using System.Net.Mail;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using MimeKit.Utils;
 
 namespace mail
 {
@@ -26,6 +28,35 @@ namespace mail
             int rand_sayı = random.Next(10000, 99999); //doğrulama codu (5 haneli)
             return rand_sayı;
         }
+        public void random_sayi_yolla(int random_sayı)
+        {
+            var message = new MimeMessage();
+            var builder = new BodyBuilder();
+            var image = builder.LinkedResources.Add(@"image.jpg");
+            image.ContentId = MimeUtils.GenerateMessageId();
+            builder.HtmlBody = string.Format
+                (
+                    @"<b>XyzMail Doğrulama Kodunuz: </b> " + random_sayı +
+                    @"<p>Bizi Tercih Ettiğiniz İçin teşekkür ederiz. <br/></p>
+
+                    <img src=""cid:{0}"" width=500 height=200 > ", image.ContentId
+                );
+
+            message.From.Add(MailboxAddress.Parse("bugraverify@gmail.com"));
+            message.To.Add(MailboxAddress.Parse(login_user.Instance.Eposta));
+            message.Subject = "XyzMail - Güvenlik Doğrulama Kodu.";
+            message.Body = builder.ToMessageBody();
+
+            using (var client = new SmtpClient())
+            {
+                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                client.Connect("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
+                client.Authenticate("bugraverify@gmail.com", "31082000B");
+
+                client.Send(message);
+                client.Disconnect(true);
+            }
+        }
 
 
         public Form2()
@@ -36,7 +67,7 @@ namespace mail
         private void Form2_Load(object sender, EventArgs e)
         {
             rndm_tutan_deger = random_fonksiyon();
-            kp2.verift_kod_gonder(rndm_tutan_deger);
+            random_sayi_yolla(rndm_tutan_deger);
             timer1.Interval = 1000;
             timer1.Enabled = true;
         }
@@ -60,7 +91,7 @@ namespace mail
             if (sayac == 31)
             {
                 rndm_tutan_deger = random_fonksiyon();
-                kp2.verift_kod_gonder(rndm_tutan_deger);
+                random_sayi_yolla(rndm_tutan_deger);
                 MessageBox.Show("Güvenlik Kodu Gönderildi!", "Güvenlik");
                 timer1.Enabled = true;
             }

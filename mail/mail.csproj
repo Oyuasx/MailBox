@@ -83,6 +83,7 @@
     <Compile Include="Form3.Designer.cs">
       <DependentUpon>Form3.cs</DependentUpon>
     </Compile>
+    <Compile Include="form3_mail_tut.cs" />
     <Compile Include="Form4.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -92,9 +93,10 @@
     <Compile Include="login_user.cs" />
     <Compile Include="mail_get_user.cs" />
     <Compile Include="mail_send_user.cs" />
-    <Compile Include="mail_send_user_bodyfile.cs" />
+    <Compile Include="form4_bodyfile_tut.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="trash_get_user.cs" />
     <Compile Include="UserControl1.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -128,6 +130,7 @@
     <EmbeddedResource Include="UserControl2.resx">
       <DependentUpon>UserControl2.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include=".editorconfig" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

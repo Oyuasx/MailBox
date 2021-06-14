@@ -11,7 +11,8 @@ using System.Windows.Forms;
 
 using System.Net;
 using System.Net.NetworkInformation;
-
+using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace mail
 {
@@ -75,7 +76,12 @@ namespace mail
                     {
                         try
                         {
-                            kp1.mail_baglanti_kontrol();    //mail üzerinden hesap kontrolü
+                            var client = new SmtpClient();
+
+                            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                            client.Connect("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
+                            client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
+                            client.Disconnect(true);
                         }
                         catch
                         {

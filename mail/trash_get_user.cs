@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace mail
 {
-    public class mail_get_user
+    public class trash_get_user
     {
-        public int id {get; set; }
+        public int id { get; set; }
         public int kisi_no { get; set; }
         public string yollayan_kisi { get; set; }
         public DateTimeOffset mail_alma_tarhi { get; set; }
@@ -23,15 +23,15 @@ namespace mail
             }
         }
     }
-    public class mail_get_user_dosyalar
+        public class trash_get_user_dosyalar
     {
-        public int id { get; set; }
-        public int kisi_no { get; set; }
-        public int alınan_mail_no { get; set; }
-        public byte[] alınan_mail_dosyalar { get; set; }
-    }
+            public int id { get; set; }
+            public int kisi_no { get; set; }
+            public int alınan_mail_no { get; set; }
+            public byte[] alınan_mail_dosyalar { get; set; }
+        }
 
-    public class mail_get_user_bodyfile
+    public class trash_get_user_bodyfile
     {
         public int id { get; set; }
         public int kisi_no { get; set; }
@@ -40,4 +40,6 @@ namespace mail
         public int width { get; set; }
         public int height { get; set; }
     }
+    
+
 }

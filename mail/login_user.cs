@@ -14,7 +14,7 @@ namespace mail
         public string IPV4 { get; set; }
         public string pc_user_name { get; set; }
 
-        public login_user() { }
+        public login_user() {}
         public static login_user Instance = new login_user();
     }
 }

@@ -73,10 +73,10 @@ namespace mail
         private void button5_Click(object sender, EventArgs e)  //attachment ekleme
         {
             OpenFileDialog file = new OpenFileDialog();
-            file.Multiselect=true;
+            file.Multiselect = true;
             if (file.ShowDialog() == DialogResult.OK)
             {
-                foreach(string dosya_Ad in file.FileNames)
+                foreach (string dosya_Ad in file.FileNames)
                 {
                     attachment_dondur.Add(dosya_Ad);
                     listBox1.Items.Add(dosya_Ad);
@@ -93,6 +93,9 @@ namespace mail
 
         string tut, rtf;
         int metinbaslangicIndex = 0;
+        int width, height;
+        int startIndex;
+        int endIndex;
         private void button2_Click(object sender, EventArgs evnt) //gönderme işlemi
         {
             if (textBox1.Text != "" && textBox2.Text != "")
@@ -134,7 +137,7 @@ namespace mail
                                     //try catch gelcek ve text html yerine textx döncek if error
                                     string html_body = markupConverter.ConvertRtfToHtml(body);
                                     builder.HtmlBody += html_body;
-                                    builder.HtmlBody += string.Format(@"<img src=""cid:{0}"" width={1} height={2} > ", bodyfile.ContentId, 600, 800);
+                                    builder.HtmlBody += string.Format(@"<img src=""cid:{0}"" width={1} height={2} > ", bodyfile.ContentId, width, height);
                                 }
                             }
                             duplicate_engelleme = false;
@@ -182,6 +185,8 @@ namespace mail
                     startIndex = 0;
                     endIndex = 0;
                     metinbaslangicIndex = 0;
+                    bfile.Clear();
+                    richTextBox1.Clear();
                 }
                 if (mesaj_gittimi == true)
                     MessageBox.Show("Mesaj Gönderildi.");
@@ -196,58 +201,60 @@ namespace mail
             }
 
         }
-
-
-        int startIndex;
-        int endIndex;
-        List<mail_send_user_bodyfile> bfile = new List<mail_send_user_bodyfile>();
+        Graphics _graphics;
+        List<form4_bodyfile_tut> bfile = new List<form4_bodyfile_tut>();
         private void button6_Click(object sender, EventArgs e)  //richtext box içine resim ekleme işlemleri
         {
-            OpenFileDialog file = new OpenFileDialog();
-            file.Multiselect = false;
-            file.Filter = "Image Files(*.jpg; *.jpeg; *.gif; *.png; *.bmp)|*.jpg; *.jpeg; *.gif; *.png; *.bmp";
-            if (file.ShowDialog() == DialogResult.OK)
+            try
             {
-                MemoryStream stream = new MemoryStream();
-                Image image = Image.FromFile(file.FileName);
-                image.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                byte[] bytes = stream.ToArray();
-                string imagetortf = BitConverter.ToString(bytes, 0).Replace("-", string.Empty);
-                StringBuilder ab = new StringBuilder();
-
-                Graphics _graphics = richTextBox1.CreateGraphics();
-                var xDpi = _graphics.DpiX;
-                var yDpi = _graphics.DpiY;
-                int picw = (int)Math.Round((image.Width / xDpi) * 2540);
-                int pich = (int)Math.Round((image.Height / yDpi) * 2540);
-                int picwgoal = (int)Math.Round((image.Width / xDpi) * 1440);
-                int pichgoal = (int)Math.Round((image.Height / yDpi) * 1440);
-
-                int rictextwgoal = (int)Math.Round((richTextBox1.Width / xDpi) * 1440);
-                if (picwgoal >= rictextwgoal)
+                OpenFileDialog file = new OpenFileDialog();
+                file.Multiselect = false;
+                file.Filter = "Image Files(*.jpg; *.jpeg; *.gif; *.png; *.bmp)|*.jpg; *.jpeg; *.gif; *.png; *.bmp";
+                if (file.ShowDialog() == DialogResult.OK)
                 {
-                    picwgoal = rictextwgoal - 700;
+                    MemoryStream stream = new MemoryStream();
+                    Image image = Image.FromFile(file.FileName);
+                    image.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    byte[] bytes = stream.ToArray();
+                    string imagetortf = BitConverter.ToString(bytes, 0).Replace("-", string.Empty);
+                    StringBuilder ab = new StringBuilder();
+
+                    _graphics = richTextBox1.CreateGraphics();
+                    int picw = (int)Math.Round((image.Width / _graphics.DpiX) * 2540);
+                    int pich = (int)Math.Round((image.Height / _graphics.DpiY) * 2540);
+                    int picwgoal = (int)Math.Round((image.Width / _graphics.DpiX) * 1440);
+                    int pichgoal = (int)Math.Round((image.Height / _graphics.DpiY) * 1440);
+
+                    int rictextwgoal = (int)Math.Round((richTextBox1.Width / _graphics.DpiX) * 1440);
+                    if (picwgoal >= rictextwgoal)
+                    {
+                        picwgoal = rictextwgoal - 700;
+                    }
+
+                    ab.Append(@"{\rtf1{\pict\pngblip");
+                    ab.Append(@"\picw" + picw);
+                    ab.Append(@"\pich" + pich);
+                    ab.Append(@"\picwgoal" + picwgoal);
+                    ab.Append(@"\pichgoal" + pichgoal);
+                    ab.Append(@"\hex ");
+                    ab.Append(imagetortf + @"}\v image");
+                    richTextBox1.SelectedRtf = ab.ToString();
+
+                    string rtf_sadelesmis_byte = ExtractImgRtf(richTextBox1.Rtf);  //rtf içinden byte çekince ilk değerinden farklı değer çıkıyor...
+                    metinbaslangicIndex = (endIndex + 12);
+
+                    bfile.Add(new form4_bodyfile_tut
+                    {
+                        file_name = file.FileName,
+                        bodyfile_string = rtf_sadelesmis_byte,
+                        bodyfile_byte = bytes
+                    });
+                    ab.Clear();
                 }
-
-                ab.Append(@"{\rtf1{\pict\pngblip");
-                ab.Append(@"\picw" + picw);
-                ab.Append(@"\pich" + pich);
-                ab.Append(@"\picwgoal" + picwgoal);
-                ab.Append(@"\pichgoal" + pichgoal);
-                ab.Append(@"\hex ");
-                ab.Append(imagetortf + @"}\v image");
-                richTextBox1.SelectedRtf = ab.ToString();
-
-                string rtf_sadelesmis_byte = ExtractImgRtf(richTextBox1.Rtf);  //rtf içinden byte çekince ilk değerinden farklı değer çıkıyor...
-                metinbaslangicIndex = (endIndex + 12);
-
-                bfile.Add(new mail_send_user_bodyfile
-                {
-                    file_name = file.FileName,
-                    bodyfile_string = rtf_sadelesmis_byte,
-                    bodyfile_byte = bytes
-                });
-                ab.Clear();
+            }
+            catch (Exception ht)
+            {
+                MessageBox.Show("" + ht);
             }
         }
 
@@ -255,6 +262,14 @@ namespace mail
         string ExtractImgRtf(string s)
         {
             startIndex = s.IndexOf("{\\pict", metinbaslangicIndex);
+
+            int widthstartIndex = s.IndexOf("\\picw", startIndex) + 5;
+            int widthendIndex = s.IndexOf("\\", widthstartIndex);
+            width = (int)Math.Round((Convert.ToInt32(s.Substring(widthstartIndex, widthendIndex - widthstartIndex)) / 1440) * _graphics.DpiX);
+            int heightstartIndex = s.IndexOf("\\pich", startIndex) + 5;
+            int heightendIndex = s.IndexOf("\\", heightstartIndex);
+            height = (int)Math.Round((Convert.ToInt32(s.Substring(heightstartIndex, heightendIndex - heightstartIndex)) / 1440) * _graphics.DpiY);
+
             int nextIndex1 = s.IndexOf("\\pichgoal", startIndex);
             int nextIndex2 = s.IndexOf(" ", nextIndex1);
             endIndex = s.IndexOf(@"}\v image\v0", nextIndex2);

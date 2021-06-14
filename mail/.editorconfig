@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0414: 'Form3.button_no' alanı atanır ancak değeri hiçbir zaman kullanılmaz
+dotnet_diagnostic.CS0414.severity = none
