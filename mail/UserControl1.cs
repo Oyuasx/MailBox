@@ -18,7 +18,8 @@ namespace MailControlLibrary1
         public UserControl1()
         {
             BorderStyle = BorderStyle.None;
-
+            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            this.BackColor = Color.Transparent;
             Controls.Add(new Label
             {
                 Height = 2,

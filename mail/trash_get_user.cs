@@ -23,13 +23,14 @@ namespace mail
             }
         }
     }
-        public class trash_get_user_dosyalar
+    public class trash_get_user_dosyalar
     {
-            public int id { get; set; }
-            public int kisi_no { get; set; }
-            public int alınan_mail_no { get; set; }
-            public byte[] alınan_mail_dosyalar { get; set; }
-        }
+        public int id { get; set; }
+        public int kisi_no { get; set; }
+        public int alınan_mail_no { get; set; }
+        public byte[] alınan_mail_dosyalar { get; set; }
+        public string attachment_name { get; set; }
+    }
 
     public class trash_get_user_bodyfile
     {

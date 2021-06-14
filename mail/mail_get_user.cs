@@ -29,6 +29,7 @@ namespace mail
         public int kisi_no { get; set; }
         public int alınan_mail_no { get; set; }
         public byte[] alınan_mail_dosyalar { get; set; }
+        public string attachment_name { get; set; }
     }
 
     public class mail_get_user_bodyfile

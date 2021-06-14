@@ -18,7 +18,6 @@ namespace mail
     {
         public int id { get; set; }
         public Byte[] alınan_mail_bodyfile { get; set; }
-        public string alınan_mail_bodyfile_name { get; set; }
         public int width { get; set; }
         public int height { get; set; }
     }
@@ -26,5 +25,6 @@ namespace mail
     {
         public int id { get; set; }
         public Byte[] alınan_mail_attachment { get; set; }
+        public string attachment_name { get; set; }
     }
 }

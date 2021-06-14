@@ -319,7 +319,7 @@ namespace mail
                                     cmd4.Parameters.AddWithValue("@width", y.width);
                                     cmd4.Parameters.AddWithValue("@height", y.height);
                                     cmd4.CommandType = CommandType.Text;
-                                    cmd4.ExecuteNonQuery();     //hata
+                                    cmd4.ExecuteNonQuery();    
                                     cmd4.Parameters.Clear();
                                 }
                             }
@@ -333,10 +333,11 @@ namespace mail
                                 using (SqlCommand cmd5 = new SqlCommand())
                                 {
                                     cmd5.Connection = con;
-                                    cmd5.CommandText = "insert into mail_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar)";
+                                    cmd5.CommandText = "insert into mail_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar, attachment_name) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar, @attachment_name)";
                                     cmd5.Parameters.AddWithValue("@alınan_mail_no", mail_id);
                                     cmd5.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
                                     cmd5.Parameters.AddWithValue("@alınan_mail_dosyalar", y.alınan_mail_attachment);
+                                    cmd5.Parameters.AddWithValue("@attachment_name", y.attachment_name);
                                     cmd5.CommandType = CommandType.Text;
                                     cmd5.ExecuteNonQuery();
                                     cmd5.Parameters.Clear();
@@ -496,10 +497,11 @@ namespace mail
                                 using (SqlCommand cmd5 = new SqlCommand())
                                 {
                                     cmd5.Connection = con;
-                                    cmd5.CommandText = "insert into mail_send_user_dosyalar(gonderilen_mail_no, kisi_no, gonderilen_mail_dosyalar) values (@gonderilen_mail_no, @kisi_no, @gonderilen_mail_dosyalar)";
+                                    cmd5.CommandText = "insert into mail_send_user_dosyalar(gonderilen_mail_no, kisi_no, gonderilen_mail_dosyalar, attachment_name) values (@gonderilen_mail_no, @kisi_no, @gonderilen_mail_dosyalar, @attachment_name)";
                                     cmd5.Parameters.AddWithValue("@gonderilen_mail_no", mail_id);
                                     cmd5.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
                                     cmd5.Parameters.AddWithValue("@gonderilen_mail_dosyalar", y.alınan_mail_attachment);
+                                    cmd5.Parameters.AddWithValue("@attachment_name", y.attachment_name);
                                     cmd5.CommandType = CommandType.Text;
                                     cmd5.ExecuteNonQuery();
                                     cmd5.Parameters.Clear();
@@ -664,10 +666,12 @@ namespace mail
                                 using (SqlCommand cmd5 = new SqlCommand())
                                 {
                                     cmd5.Connection = con;
-                                    cmd5.CommandText = "insert into trash_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar)";
+                                    cmd5.CommandText = "insert into trash_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar, attachment_name) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar, @attachment_name)";
                                     cmd5.Parameters.AddWithValue("@alınan_mail_no", mail_id);
                                     cmd5.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
                                     cmd5.Parameters.AddWithValue("@alınan_mail_dosyalar", y.alınan_mail_attachment);
+                                    cmd5.Parameters.AddWithValue("@attachment_name", y.attachment_name);
+
                                     cmd5.CommandType = CommandType.Text;
                                     cmd5.ExecuteNonQuery();
                                     cmd5.Parameters.Clear();
@@ -791,8 +795,8 @@ namespace mail
                         cmd2.CommandType = CommandType.Text;
                         cmd2.ExecuteNonQuery();
                     }
-                    con.Close();
                 }
+                con.Close();
             }
 
             using (SqlCommand cmd = new SqlCommand())
@@ -800,54 +804,59 @@ namespace mail
                 con.Open();
                 foreach (var x in mail_get)
                 {
-                    cmd.Connection = con;
-                    cmd.CommandText = "insert into trash_get_user(kisi_no, yollayan_kisi, mail_alma_tarhi, alınan_mail_konu, alınan_mail_icerik) values (@kisi_no, @yollayan_kisi, @mail_alma_tarhi, @alınan_mail_konu, @alınan_mail_icerik)";
-                    cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
-                    cmd.Parameters.AddWithValue("@yollayan_kisi", x.yollayan_kisi);
-                    cmd.Parameters.AddWithValue("@mail_alma_tarhi", x.mail_alma_tarhi);
-                    cmd.Parameters.AddWithValue("@alınan_mail_konu", x.alınan_mail_konu);
-                    cmd.Parameters.AddWithValue("@alınan_mail_icerik", x.alınan_mail_icerik);
-                    cmd.CommandType = CommandType.Text;
-                    cmd.ExecuteNonQuery();
-                    foreach(var y in mail_get_attach)
+                    if (x.id == donen_id)
                     {
-                        if(x.id == y.alınan_mail_no)
+                        cmd.Connection = con;
+                        cmd.CommandText = "insert into trash_get_user(kisi_no, yollayan_kisi, mail_alma_tarhi, alınan_mail_konu, alınan_mail_icerik) values (@kisi_no, @yollayan_kisi, @mail_alma_tarhi, @alınan_mail_konu, @alınan_mail_icerik)";
+                        cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                        cmd.Parameters.AddWithValue("@yollayan_kisi", x.yollayan_kisi);
+                        cmd.Parameters.AddWithValue("@mail_alma_tarhi", x.mail_alma_tarhi);
+                        cmd.Parameters.AddWithValue("@alınan_mail_konu", x.alınan_mail_konu);
+                        cmd.Parameters.AddWithValue("@alınan_mail_icerik", x.alınan_mail_icerik);
+                        cmd.CommandType = CommandType.Text;
+                        cmd.ExecuteNonQuery();
+                        foreach (var y in mail_get_attach)
                         {
-                            using (SqlCommand cmd1 = new SqlCommand())
+                            if (x.id == y.alınan_mail_no)
                             {
-                                cmd1.Connection = con;
-                                cmd1.CommandText = "insert into trash_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar)";
-                                cmd1.Parameters.AddWithValue("@alınan_mail_no", donen_id);
-                                cmd1.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
-                                cmd1.Parameters.AddWithValue("@alınan_mail_dosyalar", y.alınan_mail_dosyalar);
-                                cmd1.CommandType = CommandType.Text;
-                                cmd1.ExecuteNonQuery();
-                                foreach(var z in mail_get_body)
+                                using (SqlCommand cmd1 = new SqlCommand())
                                 {
-                                    if (x.id == z.alınan_mail_no)
-                                    {
-                                        using (SqlCommand cmd2 = new SqlCommand())
-                                        {
-                                            cmd2.Connection = con;
-                                            cmd2.CommandText = "insert into trash_get_user_bodyfile(alınan_mail_no, alınan_mail_bodyfile, width, height, kisi_no) values (@alınan_mail_no, @alınan_mail_bodyfile, @width, @height, @kisi_no)";
-                                            cmd2.Parameters.AddWithValue("@alınan_mail_no", donen_id);
-                                            cmd2.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
-                                            cmd2.Parameters.AddWithValue("@alınan_mail_bodyfile", z.alınan_mail_bodyfile);
-                                            cmd2.Parameters.AddWithValue("@width", z.width);
-                                            cmd2.Parameters.AddWithValue("@height", z.height);
-                                            cmd2.CommandType = CommandType.Text;
-                                            cmd2.ExecuteNonQuery();
-                                            con.Close();
-                                            cmd2.Parameters.Clear();
-                                        }
-                                    }
+                                    cmd1.Connection = con;
+                                    cmd1.CommandText = "insert into trash_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar)";
+                                    cmd1.Parameters.AddWithValue("@alınan_mail_no", donen_id);
+                                    cmd1.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd1.Parameters.AddWithValue("@alınan_mail_dosyalar", y.alınan_mail_dosyalar);
+                                    cmd1.CommandType = CommandType.Text;
+                                    cmd1.ExecuteNonQuery();
+                                    cmd1.Parameters.Clear();
                                 }
-                                cmd1.Parameters.Clear();
                             }
                         }
+                        foreach (var z in mail_get_body)
+                        {
+                            if (x.id == z.alınan_mail_no)
+                            {
+                                using (SqlCommand cmd2 = new SqlCommand())
+                                {
+                                    cmd2.Connection = con;
+                                    cmd2.CommandText = "insert into trash_get_user_bodyfile(alınan_mail_no, alınan_mail_bodyfile, width, height, kisi_no) values (@alınan_mail_no, @alınan_mail_bodyfile, @width, @height, @kisi_no)";
+                                    cmd2.Parameters.AddWithValue("@alınan_mail_no", donen_id);
+                                    cmd2.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd2.Parameters.AddWithValue("@alınan_mail_bodyfile", z.alınan_mail_bodyfile);
+                                    cmd2.Parameters.AddWithValue("@width", z.width);
+                                    cmd2.Parameters.AddWithValue("@height", z.height);
+                                    cmd2.CommandType = CommandType.Text;
+                                    cmd2.ExecuteNonQuery();
+                                    cmd2.Parameters.Clear();
+                                }
+                            }
+                        }
+                        cmd.Parameters.Clear();
+                        break;
                     }
-                    cmd.Parameters.Clear();
+
                 }
+                con.Close();
             }
         }
 
@@ -880,9 +889,9 @@ namespace mail
                         cmd2.Parameters.AddWithValue("@kisi_no", login_user.Instance.id); ;
                         cmd2.CommandType = CommandType.Text;
                         cmd2.ExecuteNonQuery();
-                        con.Close();
                     }
                 }
+                con.Close();
             }
 
             using (SqlCommand cmd = new SqlCommand())
@@ -890,54 +899,58 @@ namespace mail
                 con.Open();
                 foreach (var x in mail_get)
                 {
-                    cmd.Connection = con;
-                    cmd.CommandText = "insert into trash_get_user(kisi_no, yollayan_kisi, mail_alma_tarhi, alınan_mail_konu, alınan_mail_icerik) values (@kisi_no, @yollayan_kisi, @mail_alma_tarhi, @alınan_mail_konu, @alınan_mail_icerik)";
-                    cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
-                    cmd.Parameters.AddWithValue("@yollayan_kisi", login_user.Instance.Eposta);
-                    cmd.Parameters.AddWithValue("@mail_alma_tarhi", x.mail_yollama_tarhi);
-                    cmd.Parameters.AddWithValue("@alınan_mail_konu", x.gonderilen_mail_konu);
-                    cmd.Parameters.AddWithValue("@alınan_mail_icerik", x.gonderilen_mail_icerik);
-                    cmd.CommandType = CommandType.Text;
-                    cmd.ExecuteNonQuery();
-                    foreach (var y in mail_get_attach)
+                    if (x.id == donen_id)
                     {
-                        if (x.id == y.gonderilen_mail_no)
+                        cmd.Connection = con;
+                        cmd.CommandText = "insert into trash_get_user(kisi_no, yollayan_kisi, mail_alma_tarhi, alınan_mail_konu, alınan_mail_icerik) values (@kisi_no, @yollayan_kisi, @mail_alma_tarhi, @alınan_mail_konu, @alınan_mail_icerik)";
+                        cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                        cmd.Parameters.AddWithValue("@yollayan_kisi", login_user.Instance.Eposta);
+                        cmd.Parameters.AddWithValue("@mail_alma_tarhi", x.mail_yollama_tarhi);
+                        cmd.Parameters.AddWithValue("@alınan_mail_konu", x.gonderilen_mail_konu);
+                        cmd.Parameters.AddWithValue("@alınan_mail_icerik", x.gonderilen_mail_icerik);
+                        cmd.CommandType = CommandType.Text;
+                        cmd.ExecuteNonQuery();
+                        foreach (var y in mail_get_attach)
                         {
-                            using (SqlCommand cmd1 = new SqlCommand())
+                            if (x.id == y.gonderilen_mail_no)
                             {
-                                cmd1.Connection = con;
-                                cmd1.CommandText = "insert into trash_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar)";
-                                cmd1.Parameters.AddWithValue("@alınan_mail_no", donen_id);
-                                cmd1.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
-                                cmd1.Parameters.AddWithValue("@alınan_mail_dosyalar", y.gonderilen_mail_dosyalar);
-                                cmd1.CommandType = CommandType.Text;
-                                cmd1.ExecuteNonQuery();
-                                foreach (var z in mail_get_body)
+                                using (SqlCommand cmd1 = new SqlCommand())
                                 {
-                                    if (x.id == z.gonderilen_mail_no)
-                                    {
-                                        using (SqlCommand cmd2 = new SqlCommand())
-                                        {
-                                            cmd2.Connection = con;
-                                            cmd2.CommandText = "insert into trash_get_user_bodyfile(alınan_mail_no, alınan_mail_bodyfile, width, height, kisi_no) values (@alınan_mail_no, @alınan_mail_bodyfile, @width, @height, @kisi_no)";
-                                            cmd2.Parameters.AddWithValue("@alınan_mail_no", donen_id);
-                                            cmd2.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
-                                            cmd2.Parameters.AddWithValue("@alınan_mail_bodyfile", z.gonderilen_mail_bodyfile);
-                                            cmd2.Parameters.AddWithValue("@width", z.width);
-                                            cmd2.Parameters.AddWithValue("@height", z.height);
-                                            cmd2.CommandType = CommandType.Text;
-                                            cmd2.ExecuteNonQuery();
-                                            con.Close();
-                                            cmd2.Parameters.Clear();
-                                        }
-                                    }
+                                    cmd1.Connection = con;
+                                    cmd1.CommandText = "insert into trash_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar)";
+                                    cmd1.Parameters.AddWithValue("@alınan_mail_no", donen_id);
+                                    cmd1.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd1.Parameters.AddWithValue("@alınan_mail_dosyalar", y.gonderilen_mail_dosyalar);
+                                    cmd1.CommandType = CommandType.Text;
+                                    cmd1.ExecuteNonQuery();
+                                    cmd1.Parameters.Clear();
                                 }
-                                cmd1.Parameters.Clear();
                             }
                         }
+                        foreach (var z in mail_get_body)
+                        {
+                            if (x.id == z.gonderilen_mail_no)
+                            {
+                                using (SqlCommand cmd2 = new SqlCommand())
+                                {
+                                    cmd2.Connection = con;
+                                    cmd2.CommandText = "insert into trash_get_user_bodyfile(alınan_mail_no, alınan_mail_bodyfile, width, height, kisi_no) values (@alınan_mail_no, @alınan_mail_bodyfile, @width, @height, @kisi_no)";
+                                    cmd2.Parameters.AddWithValue("@alınan_mail_no", donen_id);
+                                    cmd2.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd2.Parameters.AddWithValue("@alınan_mail_bodyfile", z.gonderilen_mail_bodyfile);
+                                    cmd2.Parameters.AddWithValue("@width", z.width);
+                                    cmd2.Parameters.AddWithValue("@height", z.height);
+                                    cmd2.CommandType = CommandType.Text;
+                                    cmd2.ExecuteNonQuery();
+                                    cmd2.Parameters.Clear();
+                                }
+                            }
+                        }
+                        cmd.Parameters.Clear();
+                        break;
                     }
-                    cmd.Parameters.Clear();
                 }
+                con.Close();
             }
         }
 
@@ -970,8 +983,8 @@ namespace mail
                         cmd2.CommandType = CommandType.Text;
                         cmd2.ExecuteNonQuery();
                     }
-                    con.Close();
                 }
+                con.Close();
             }
         }
 
@@ -1031,7 +1044,7 @@ namespace mail
             {
                 cmd.Connection = con;
                 con.Open();
-                cmd.CommandText = "SELECT id,alınan_mail_no,alınan_mail_dosyalar from mail_get_user_dosyalar where kisi_no=@kisi_no order by alınan_mail_no DESC";
+                cmd.CommandText = "SELECT id,alınan_mail_no,alınan_mail_dosyalar,attachment_name from mail_get_user_dosyalar where kisi_no=@kisi_no order by alınan_mail_no DESC";
                 cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id); ;
                 cmd.CommandType = CommandType.Text;
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1042,7 +1055,8 @@ namespace mail
                         id = (Int32)dr["id"],
                         kisi_no = login_user.Instance.id,
                         alınan_mail_no = (Int32)dr["alınan_mail_no"],
-                        alınan_mail_dosyalar = (byte[])dr["alınan_mail_dosyalar"]
+                        alınan_mail_dosyalar = (byte[])dr["alınan_mail_dosyalar"],
+                        attachment_name = dr["attachment_name"].ToString()
                     });
                 }
                 dr.Close();
@@ -1112,7 +1126,7 @@ namespace mail
             {
                 cmd.Connection = con;
                 con.Open();
-                cmd.CommandText = "SELECT id,gonderilen_mail_no,gonderilen_mail_dosyalar from mail_send_user_dosyalar where kisi_no=@kisi_no order by gonderilen_mail_no DESC";
+                cmd.CommandText = "SELECT id,gonderilen_mail_no,gonderilen_mail_dosyalar,attachment_name from mail_send_user_dosyalar where kisi_no=@kisi_no order by gonderilen_mail_no DESC";
                 cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id); ;
                 cmd.CommandType = CommandType.Text;
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1124,6 +1138,7 @@ namespace mail
                         kisi_no = login_user.Instance.id,
                         gonderilen_mail_no = (Int32)dr["gonderilen_mail_no"],
                         gonderilen_mail_dosyalar = (byte[])dr["gonderilen_mail_dosyalar"],
+                        attachment_name = dr["attachment_name"].ToString()
                     });
                 }
                 dr.Close();
@@ -1195,7 +1210,7 @@ namespace mail
             {
                 cmd.Connection = con;
                 con.Open();
-                cmd.CommandText = "SELECT id,alınan_mail_no,alınan_mail_dosyalar from trash_get_user_dosyalar where kisi_no=@kisi_no order by alınan_mail_no DESC";
+                cmd.CommandText = "SELECT id,alınan_mail_no,alınan_mail_dosyalar,attachment_name from trash_get_user_dosyalar where kisi_no=@kisi_no order by alınan_mail_no DESC";
                 cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id); ;
                 cmd.CommandType = CommandType.Text;
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1206,7 +1221,8 @@ namespace mail
                         id = (Int32)dr["id"],
                         kisi_no = login_user.Instance.id,
                         alınan_mail_no = (Int32)dr["alınan_mail_no"],
-                        alınan_mail_dosyalar = (byte[])dr["alınan_mail_dosyalar"]
+                        alınan_mail_dosyalar = (byte[])dr["alınan_mail_dosyalar"],
+                        attachment_name = dr["attachment_name"].ToString()
                     });
                 }
                 dr.Close();
@@ -1243,5 +1259,132 @@ namespace mail
             return dondur3_bodyfile;
         }
 
+
+
+        public void form3_secilen_degeri_geri_yukle_1(int donen_id, List<trash_get_user> mail_get, List<trash_get_user_dosyalar> mail_get_attach, List<trash_get_user_bodyfile> mail_get_body)
+        {
+
+            using (SqlCommand cmd = new SqlCommand())
+            {
+                con.Open();
+                foreach (var x in mail_get)
+                {
+                    if(x.id == donen_id)
+                    {
+                        cmd.Connection = con;
+                        cmd.CommandText = "insert into mail_get_user(kisi_no, yollayan_kisi, mail_alma_tarhi, alınan_mail_konu, alınan_mail_icerik) values (@kisi_no, @yollayan_kisi, @mail_alma_tarhi, @alınan_mail_konu, @alınan_mail_icerik)";
+                        cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                        cmd.Parameters.AddWithValue("@yollayan_kisi", x.yollayan_kisi);
+                        cmd.Parameters.AddWithValue("@mail_alma_tarhi", x.mail_alma_tarhi);
+                        cmd.Parameters.AddWithValue("@alınan_mail_konu", x.alınan_mail_konu);
+                        cmd.Parameters.AddWithValue("@alınan_mail_icerik", x.alınan_mail_icerik);
+                        cmd.CommandType = CommandType.Text;
+                        cmd.ExecuteNonQuery();
+                        foreach (var y in mail_get_attach)
+                        {
+                            if (x.id == y.alınan_mail_no)
+                            {
+                                using (SqlCommand cmd1 = new SqlCommand())
+                                {
+                                    cmd1.Connection = con;
+                                    cmd1.CommandText = "insert into mail_get_user_dosyalar(alınan_mail_no, kisi_no, alınan_mail_dosyalar) values (@alınan_mail_no, @kisi_no, @alınan_mail_dosyalar)";
+                                    cmd1.Parameters.AddWithValue("@alınan_mail_no", donen_id);
+                                    cmd1.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd1.Parameters.AddWithValue("@alınan_mail_dosyalar", y.alınan_mail_dosyalar);
+                                    cmd1.CommandType = CommandType.Text;
+                                    cmd1.ExecuteNonQuery();
+                                    cmd1.Parameters.Clear();
+                                }
+                            }
+                        }
+                        foreach (var z in mail_get_body)
+                        {
+                            if (x.id == z.alınan_mail_no)
+                            {
+                                using (SqlCommand cmd2 = new SqlCommand())
+                                {
+                                    cmd2.Connection = con;
+                                    cmd2.CommandText = "insert into mail_get_user_bodyfile(alınan_mail_no, alınan_mail_bodyfile, width, height, kisi_no) values (@alınan_mail_no, @alınan_mail_bodyfile, @width, @height, @kisi_no)";
+                                    cmd2.Parameters.AddWithValue("@alınan_mail_no", donen_id);
+                                    cmd2.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd2.Parameters.AddWithValue("@alınan_mail_bodyfile", z.alınan_mail_bodyfile);
+                                    cmd2.Parameters.AddWithValue("@width", z.width);
+                                    cmd2.Parameters.AddWithValue("@height", z.height);
+                                    cmd2.CommandType = CommandType.Text;
+                                    cmd2.ExecuteNonQuery();
+                                    cmd2.Parameters.Clear();
+                                }
+                            }
+                        }
+                        cmd.Parameters.Clear();
+                        break;
+                    }
+                }
+                con.Close();
+            }
+        }
+        
+        
+        public void form3_secilen_degeri_geri_yukle_2(int donen_id, List<trash_get_user> mail_get, List<trash_get_user_dosyalar> mail_get_attach, List<trash_get_user_bodyfile> mail_get_body)
+        {
+
+            using (SqlCommand cmd = new SqlCommand())
+            {
+                con.Open();
+                foreach (var x in mail_get)
+                {
+                    if (x.id == donen_id)
+                    {
+                        cmd.Connection = con;
+                        cmd.CommandText = "insert into mail_send_user(kisi_no, mail_yollama_tarhi, gonderilen_mail_konu, gonderilen_mail_icerik) values (@kisi_no, @mail_yollama_tarhi, @gonderilen_mail_konu, @gonderilen_mail_icerik)";
+                        cmd.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                        cmd.Parameters.AddWithValue("@mail_yollama_tarhi", x.mail_alma_tarhi);
+                        cmd.Parameters.AddWithValue("@gonderilen_mail_konu", x.alınan_mail_konu);
+                        cmd.Parameters.AddWithValue("@gonderilen_mail_icerik", x.alınan_mail_icerik);
+                        cmd.CommandType = CommandType.Text;
+                        cmd.ExecuteNonQuery();
+                        foreach (var y in mail_get_attach)
+                        {
+                            if (x.id == y.alınan_mail_no)
+                            {
+                                using (SqlCommand cmd1 = new SqlCommand())
+                                {
+                                    cmd1.Connection = con;
+                                    cmd1.CommandText = "insert into mail_send_user_dosyalar(gonderilen_mail_no, kisi_no, gonderilen_mail_dosyalar) values (@gonderilen_mail_no, @kisi_no, @gonderilen_mail_dosyalar)";
+                                    cmd1.Parameters.AddWithValue("@gonderilen_mail_no", donen_id);
+                                    cmd1.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd1.Parameters.AddWithValue("@gonderilen_mail_dosyalar", y.alınan_mail_dosyalar);
+                                    cmd1.CommandType = CommandType.Text;
+                                    cmd1.ExecuteNonQuery();
+                                    cmd1.Parameters.Clear();
+                                }
+                            }
+                        }
+                        foreach (var z in mail_get_body)
+                        {
+                            if (x.id == z.alınan_mail_no)
+                            {
+                                using (SqlCommand cmd2 = new SqlCommand())
+                                {
+                                    cmd2.Connection = con;
+                                    cmd2.CommandText = "insert into mail_send_user_bodyfile(gonderilen_mail_no, kisi_no, gonderilen_mail_bodyfile, width, height) values (@gonderilen_mail_no, @kisi_no, @gonderilen_mail_bodyfile, @width, @height)";
+                                    cmd2.Parameters.AddWithValue("@gonderilen_mail_no", donen_id);
+                                    cmd2.Parameters.AddWithValue("@kisi_no", login_user.Instance.id);
+                                    cmd2.Parameters.AddWithValue("@gonderilen_mail_bodyfile", z.alınan_mail_bodyfile);
+                                    cmd2.Parameters.AddWithValue("@width", z.width);
+                                    cmd2.Parameters.AddWithValue("@height", z.height);
+                                    cmd2.CommandType = CommandType.Text;
+                                    cmd2.ExecuteNonQuery();
+                                    cmd2.Parameters.Clear();
+                                }
+                            }
+                        }
+                        cmd.Parameters.Clear();
+                        break;
+                    }
+                }
+                con.Close();
+            }
+        }
     }
 }

@@ -54,7 +54,7 @@ namespace mail
             // 
             // richTextBox1
             // 
-            this.richTextBox1.BackColor = System.Drawing.Color.SkyBlue;
+            this.richTextBox1.BackColor = System.Drawing.Color.LightBlue;
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.richTextBox1.Location = new System.Drawing.Point(12, 157);
             this.richTextBox1.Name = "richTextBox1";
@@ -95,9 +95,10 @@ namespace mail
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.LightBlue;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label1.ForeColor = System.Drawing.Color.Navy;
-            this.label1.Location = new System.Drawing.Point(12, 111);
+            this.label1.Location = new System.Drawing.Point(12, 140);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(50, 17);
             this.label1.TabIndex = 21;
@@ -106,9 +107,10 @@ namespace mail
             // label2
             // 
             this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.Color.LightBlue;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label2.ForeColor = System.Drawing.Color.Navy;
-            this.label2.Location = new System.Drawing.Point(14, 50);
+            this.label2.Location = new System.Drawing.Point(12, 123);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(48, 17);
             this.label2.TabIndex = 22;
@@ -120,32 +122,34 @@ namespace mail
             // 
             // pictureBox1
             // 
+            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBox1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.BackgroundImage")));
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox1.Location = new System.Drawing.Point(672, 50);
+            this.pictureBox1.Location = new System.Drawing.Point(31, 35);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(368, 78);
+            this.pictureBox1.Size = new System.Drawing.Size(469, 78);
             this.pictureBox1.TabIndex = 28;
             this.pictureBox1.TabStop = false;
             // 
             // listBox1
             // 
-            this.listBox1.BackColor = System.Drawing.Color.SkyBlue;
+            this.listBox1.BackColor = System.Drawing.Color.LightBlue;
             this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(795, 357);
+            this.listBox1.Location = new System.Drawing.Point(795, 305);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(245, 104);
+            this.listBox1.Size = new System.Drawing.Size(245, 169);
             this.listBox1.TabIndex = 39;
             // 
             // button6
             // 
+            this.button6.BackColor = System.Drawing.Color.Transparent;
             this.button6.BorderColor = System.Drawing.Color.Black;
             this.button6.ButtonColor = System.Drawing.Color.SkyBlue;
             this.button6.FlatAppearance.BorderSize = 0;
             this.button6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button6.Location = new System.Drawing.Point(794, 313);
+            this.button6.Location = new System.Drawing.Point(604, 111);
             this.button6.Name = "button6";
             this.button6.OnHoverBorderColor = System.Drawing.Color.Navy;
             this.button6.OnHoverButtonColor = System.Drawing.Color.DeepSkyBlue;
@@ -154,17 +158,18 @@ namespace mail
             this.button6.TabIndex = 41;
             this.button6.Text = "Metine Resim Ekle";
             this.button6.TextColor = System.Drawing.Color.Navy;
-            this.button6.UseVisualStyleBackColor = true;
+            this.button6.UseVisualStyleBackColor = false;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button5
             // 
+            this.button5.BackColor = System.Drawing.Color.Transparent;
             this.button5.BorderColor = System.Drawing.Color.Black;
             this.button5.ButtonColor = System.Drawing.Color.SkyBlue;
             this.button5.FlatAppearance.BorderSize = 0;
             this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button5.Location = new System.Drawing.Point(935, 473);
+            this.button5.Location = new System.Drawing.Point(882, 265);
             this.button5.Name = "button5";
             this.button5.OnHoverBorderColor = System.Drawing.Color.Navy;
             this.button5.OnHoverButtonColor = System.Drawing.Color.DeepSkyBlue;
@@ -173,17 +178,18 @@ namespace mail
             this.button5.TabIndex = 37;
             this.button5.Text = "Dosya Ekle";
             this.button5.TextColor = System.Drawing.Color.Navy;
-            this.button5.UseVisualStyleBackColor = true;
+            this.button5.UseVisualStyleBackColor = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button7
             // 
+            this.button7.BackColor = System.Drawing.Color.Transparent;
             this.button7.BorderColor = System.Drawing.Color.Black;
             this.button7.ButtonColor = System.Drawing.Color.SkyBlue;
             this.button7.FlatAppearance.BorderSize = 0;
             this.button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button7.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button7.Location = new System.Drawing.Point(882, 473);
+            this.button7.Location = new System.Drawing.Point(993, 265);
             this.button7.Name = "button7";
             this.button7.OnHoverBorderColor = System.Drawing.Color.Navy;
             this.button7.OnHoverButtonColor = System.Drawing.Color.DeepSkyBlue;
@@ -192,36 +198,38 @@ namespace mail
             this.button7.TabIndex = 36;
             this.button7.Text = "Clr";
             this.button7.TextColor = System.Drawing.Color.Navy;
-            this.button7.UseVisualStyleBackColor = true;
+            this.button7.UseVisualStyleBackColor = false;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button2
             // 
+            this.button2.BackColor = System.Drawing.Color.Transparent;
             this.button2.BorderColor = System.Drawing.Color.Black;
             this.button2.ButtonColor = System.Drawing.Color.SkyBlue;
             this.button2.FlatAppearance.BorderSize = 0;
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button2.Location = new System.Drawing.Point(888, 513);
+            this.button2.Location = new System.Drawing.Point(862, 504);
             this.button2.Name = "button2";
             this.button2.OnHoverBorderColor = System.Drawing.Color.Navy;
             this.button2.OnHoverButtonColor = System.Drawing.Color.DeepSkyBlue;
             this.button2.OnHoverTextColor = System.Drawing.Color.Navy;
-            this.button2.Size = new System.Drawing.Size(152, 50);
+            this.button2.Size = new System.Drawing.Size(178, 59);
             this.button2.TabIndex = 35;
             this.button2.Text = "Mesaj Gönder";
             this.button2.TextColor = System.Drawing.Color.Navy;
-            this.button2.UseVisualStyleBackColor = true;
+            this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
+            this.button1.BackColor = System.Drawing.Color.Transparent;
             this.button1.BorderColor = System.Drawing.Color.Black;
             this.button1.ButtonColor = System.Drawing.Color.SkyBlue;
             this.button1.FlatAppearance.BorderSize = 0;
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button1.Location = new System.Drawing.Point(794, 513);
+            this.button1.Location = new System.Drawing.Point(794, 167);
             this.button1.Name = "button1";
             this.button1.OnHoverBorderColor = System.Drawing.Color.Navy;
             this.button1.OnHoverButtonColor = System.Drawing.Color.DeepSkyBlue;
@@ -230,17 +238,18 @@ namespace mail
             this.button1.TabIndex = 34;
             this.button1.Text = "R";
             this.button1.TextColor = System.Drawing.Color.Navy;
-            this.button1.UseVisualStyleBackColor = true;
+            this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button3
             // 
+            this.button3.BackColor = System.Drawing.Color.Transparent;
             this.button3.BorderColor = System.Drawing.Color.Black;
             this.button3.ButtonColor = System.Drawing.Color.SkyBlue;
             this.button3.FlatAppearance.BorderSize = 0;
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button3.Location = new System.Drawing.Point(794, 467);
+            this.button3.Location = new System.Drawing.Point(795, 213);
             this.button3.Name = "button3";
             this.button3.OnHoverBorderColor = System.Drawing.Color.Navy;
             this.button3.OnHoverButtonColor = System.Drawing.Color.DeepSkyBlue;
@@ -249,31 +258,31 @@ namespace mail
             this.button3.TabIndex = 33;
             this.button3.Text = "T";
             this.button3.TextColor = System.Drawing.Color.Navy;
-            this.button3.UseVisualStyleBackColor = true;
+            this.button3.UseVisualStyleBackColor = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // textBox2
             // 
-            this.textBox2.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.textBox2.BackColor = System.Drawing.Color.LightBlue;
             this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox2.BottomBorderColor = System.Drawing.Color.Black;
             this.textBox2.BottomBorderFocusColor = System.Drawing.Color.Blue;
             this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.textBox2.Location = new System.Drawing.Point(17, 132);
+            this.textBox2.Location = new System.Drawing.Point(62, 140);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(473, 16);
             this.textBox2.TabIndex = 32;
             // 
             // textBox1
             // 
-            this.textBox1.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.textBox1.BackColor = System.Drawing.Color.LightBlue;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.BottomBorderColor = System.Drawing.Color.Black;
             this.textBox1.BottomBorderFocusColor = System.Drawing.Color.Blue;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.textBox1.Location = new System.Drawing.Point(17, 70);
+            this.textBox1.Location = new System.Drawing.Point(60, 123);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(300, 16);
+            this.textBox1.Size = new System.Drawing.Size(331, 16);
             this.textBox1.TabIndex = 31;
             // 
             // Form4
@@ -281,6 +290,7 @@ namespace mail
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(1052, 575);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.listBox1);
