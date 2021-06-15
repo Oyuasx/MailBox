@@ -238,11 +238,12 @@ namespace mail
                     ab.Append(@"\pichgoal" + pichgoal);
                     ab.Append(@"\hex ");
                     ab.Append(imagetortf + @"}\v image");
+                    RichTextBox rt = new RichTextBox();
+                    rt.Rtf = ab.ToString();
                     richTextBox1.SelectedRtf = ab.ToString();
-
-                    string rtf_sadelesmis_byte = ExtractImgRtf(richTextBox1.Rtf);  //rtf içinden byte çekince ilk değerinden farklı değer çıkıyor...
-                    metinbaslangicIndex = (endIndex + 12);
-
+                    metinbaslangicIndex = 0;
+                    string rtf_sadelesmis_byte = ExtractImgRtf(rt.Rtf);  //rtf içinden byte çekince ilk değerinden farklı değer çıkıyor...(o yüzden içinden çekmek zorundayım)
+                     
                     bfile.Add(new form4_bodyfile_tut
                     {
                         file_name = file.FileName,

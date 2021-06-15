@@ -338,9 +338,15 @@ namespace mail
                             if (hataa == true)
                             {
                                 text = tut.Substring(metinbaslangicIndex, tut.Length - metinbaslangicIndex);
-
-                                convert = markupConverter.ConvertHtmlToRtf(text);
-                                richTextBox1.SelectedRtf = convert;
+                                try
+                                {
+                                    convert = markupConverter.ConvertHtmlToRtf(text);
+                                    richTextBox1.SelectedRtf = convert;
+                                }
+                                catch (Exception)
+                                {
+                                    richTextBox1.SelectedText = ConvertHtmlToText(text);
+                                }
                             }
                         }
                         else
