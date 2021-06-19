@@ -253,9 +253,8 @@ namespace mail
                     ab.Clear();
                 }
             }
-            catch (Exception ht)
+            catch (Exception)
             {
-                MessageBox.Show("" + ht);
             }
         }
 

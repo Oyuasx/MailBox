@@ -46,6 +46,7 @@ namespace mail
 
         private void Form3_Load(object sender, EventArgs e)
         {
+            backgroundWorker1.WorkerReportsProgress = true;
             pictureBox1.BackColor = Color.Transparent;
             listBox2.HorizontalScrollbar = true;
             listBox1.HorizontalScrollbar = true;
@@ -55,6 +56,7 @@ namespace mail
             listBox2.DataSource = gelen_kutusu;
             listBox2.DisplayMember = "tam_deger";
             label2.Text = $"Total: {gelen_kutusu.Count}";
+            label3.Text = "Gelen Kutusu:";
             giden_kutusu = kp3.form3_db_cekme_islemler_giden_mail();
             giden_kutusu_bodyfile = kp3.form3_db_cekme_islemler_giden_mail_bodyfile();
             giden_kutusu_dosya = kp3.form3_db_cekme_islemler_giden_mail_attachment();
@@ -63,13 +65,11 @@ namespace mail
             trash_kutusu_dosya = kp3.form3_db_cekme_islemler_trash_mail_attachment();
 
 
-            //trash işlemelri bakılacak
-
-
             if (NetworkInterface.GetIsNetworkAvailable() == true)
             {
                 backgroundWorker1.WorkerReportsProgress = true;
                 backgroundWorker1.WorkerSupportsCancellation = true;
+                button6.BorderColor = Color.DarkGreen;
                 label1.Text = "Mailler güncelleniyor...";
                 backgroundWorker1.RunWorkerAsync();
             }
@@ -262,81 +262,235 @@ namespace mail
         Graphics _graphics;
         private void button2_Click(object sender, EventArgs e)
         {
-            dizi = listBox2.SelectedIndex;
-            string tut;
-            if(listBox2.SelectedItems.Count > 0)
+            try
             {
-                if(pictureBox3.BackColor == Color.Green)
-                    pictureBox3.BackColor = Color.Red;
-                okundumu = true;
-                richTextBox1.Clear();
-                metinbaslangicIndex = 0;
-                hataa = false;
-                IMarkupConverter markupConverter = new MarkupConverter.MarkupConverter();
-                if (button_no == 1)
+                dizi = listBox2.SelectedIndex;
+                string tut;
+                if (listBox2.SelectedItems.Count > 0)
                 {
-                    if (checkBox1.Checked != true)
+                    if (pictureBox3.BackColor == Color.Green)
+                        pictureBox3.BackColor = Color.Red;
+                    okundumu = true;
+                    richTextBox1.Clear();
+                    metinbaslangicIndex = 0;
+                    hataa = false;
+                    IMarkupConverter markupConverter = new MarkupConverter.MarkupConverter();
+                    if (button_no == 1)
                     {
                         bool htmlkontrol = (gelen_kutusu[dizi].alınan_mail_icerik != HttpUtility.HtmlEncode(gelen_kutusu[dizi].alınan_mail_icerik));
                         tut = gelen_kutusu[dizi].alınan_mail_icerik;
-                        if (htmlkontrol == true)
+                        if (checkBox1.Checked != true)
                         {
-                            string text;
-                            string convert;
-                            foreach (var x in gelen_kutusu_bodyfile)
+                            if (htmlkontrol == true)
                             {
-                                try
+                                string text;
+                                string convert;
+                                foreach (var x in gelen_kutusu_bodyfile)
                                 {
-                                    int kontrol = tut.IndexOf("< img src", metinbaslangicIndex);
-                                    if (kontrol == -1)
-                                        kontrol = tut.IndexOf("<img src", metinbaslangicIndex);
-                                    if (kontrol == -1)
-                                        hataa = true;
-                                    if (hataa == false)
+                                    try
                                     {
-                                        if (x.alınan_mail_no == gelen_kutusu[dizi].id)
+                                        int kontrol = tut.IndexOf("< img src", metinbaslangicIndex);
+                                        if (kontrol == -1)
+                                            kontrol = tut.IndexOf("<img src", metinbaslangicIndex);
+                                        if (kontrol == -1)
+                                            hataa = true;
+                                        if (hataa == false)
                                         {
-                                            int deger1 = tut.IndexOf(">", kontrol) + 1;
-                                            text = tut.Substring(metinbaslangicIndex, kontrol - metinbaslangicIndex);
-                                            convert = markupConverter.ConvertHtmlToRtf(text);
-                                            richTextBox1.SelectedRtf = convert;
-                                            metinbaslangicIndex = deger1;
-
-                                            StringBuilder ab = new StringBuilder();
-
-                                            _graphics = richTextBox1.CreateGraphics();
-                                            int picw = (int)Math.Round((x.width / _graphics.DpiX) * 2540);
-                                            int pich = (int)Math.Round((x.height / _graphics.DpiY) * 2540);
-                                            int picwgoal = (int)Math.Round((x.width / _graphics.DpiX) * 1440);
-                                            int pichgoal = (int)Math.Round((x.height / _graphics.DpiY) * 1440);
-
-                                            int rictextwgoal = (int)Math.Round((richTextBox1.Width / _graphics.DpiX) * 1440);
-                                            if (picwgoal >= rictextwgoal)
+                                            if (x.alınan_mail_no == gelen_kutusu[dizi].id)
                                             {
-                                                picwgoal = rictextwgoal - 700;
-                                            }
-                                            string imagetortf = BitConverter.ToString(x.alınan_mail_bodyfile, 0).Replace("-", string.Empty);
+                                                int deger1 = tut.IndexOf(">", kontrol) + 1;
+                                                text = tut.Substring(metinbaslangicIndex, kontrol - metinbaslangicIndex);
+                                                try
+                                                {
+                                                    convert = markupConverter.ConvertHtmlToRtf(text);
+                                                    richTextBox1.SelectedRtf = convert;
+                                                }
+                                                catch (Exception)
+                                                {
+                                                    try
+                                                    {
+                                                        convert = ConvertHtmlToText(text);
+                                                        richTextBox1.SelectedText = convert;
+                                                    }
+                                                    catch (Exception)
+                                                    {
+                                                        richTextBox1.SelectedText = text;
+                                                    }
+                                                }
+                                                metinbaslangicIndex = deger1;
 
-                                            ab.Append(@"{\rtf1{\pict\pngblip");
-                                            ab.Append(@"\picw" + picw);
-                                            ab.Append(@"\pich" + pich);
-                                            ab.Append(@"\picwgoal" + picwgoal);
-                                            ab.Append(@"\pichgoal" + pichgoal);
-                                            ab.Append(@"\hex ");
-                                            ab.Append(imagetortf + @"}\v image");
-                                            ab.Append(@"}\par}");
-                                            richTextBox1.SelectedRtf = ab.ToString();
-                                            ab.Clear();
+                                                StringBuilder ab = new StringBuilder();
+
+                                                _graphics = richTextBox1.CreateGraphics();
+                                                int picw = (int)Math.Round((x.width / _graphics.DpiX) * 2540);
+                                                int pich = (int)Math.Round((x.height / _graphics.DpiY) * 2540);
+                                                int picwgoal = (int)Math.Round((x.width / _graphics.DpiX) * 1440);
+                                                int pichgoal = (int)Math.Round((x.height / _graphics.DpiY) * 1440);
+
+                                                int rictextwgoal = (int)Math.Round((richTextBox1.Width / _graphics.DpiX) * 1440);
+                                                if (picwgoal >= rictextwgoal)
+                                                {
+                                                    picwgoal = rictextwgoal - 700;
+                                                }
+                                                string imagetortf = BitConverter.ToString(x.alınan_mail_bodyfile, 0).Replace("-", string.Empty);
+
+                                                ab.Append(@"{\rtf1{\pict\pngblip");
+                                                ab.Append(@"\picw" + picw);
+                                                ab.Append(@"\pich" + pich);
+                                                ab.Append(@"\picwgoal" + picwgoal);
+                                                ab.Append(@"\pichgoal" + pichgoal);
+                                                ab.Append(@"\hex ");
+                                                ab.Append(imagetortf + @"}\v image");
+                                                ab.Append(@"}\par}");
+                                                richTextBox1.SelectedRtf = ab.ToString();
+                                                ab.Clear();
+                                            }
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        hataa = true;
+                                    }
+                                }
+                                if (hataa == true)
+                                {
+                                    text = tut.Substring(metinbaslangicIndex, tut.Length - metinbaslangicIndex);
+                                    try
+                                    {
+                                        convert = markupConverter.ConvertHtmlToRtf(text);
+                                        richTextBox1.SelectedRtf = convert;
+                                    }
+                                    catch (Exception)
+                                    {
+                                        try
+                                        {
+                                            richTextBox1.SelectedText = ConvertHtmlToText(text);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            richTextBox1.SelectedText = text;
                                         }
                                     }
                                 }
+                            }
+                            else
+                            {
+                                richTextBox1.Text = tut;
+                            }
+                        }
+                        else
+                        {
+                            if (htmlkontrol == true)
+                            {
+                                try
+                                {
+                                    richTextBox1.Text = ConvertHtmlToText(tut);
+                                }
                                 catch (Exception)
                                 {
-                                    hataa = true;
+                                    richTextBox1.Text = tut;
                                 }
                             }
-                            if (hataa == true)
+                            else
+                                richTextBox1.Text = tut;
+                        }
+
+
+                        //buttonla okuduğumuz mailde attachment varmı, varsa picturebox rengi değişçek
+                        listBox1.Items.Clear();
+                        if (gelen_kutusu_dosya.Count > 0)
+                        {
+                            foreach (var y in gelen_kutusu_dosya)
                             {
+                                if (y.alınan_mail_no == gelen_kutusu[dizi].id)
+                                {
+                                    listBox1.Items.Add(y.attachment_name);
+                                    pictureBox3.BackColor = Color.Green;
+                                }
+                            }
+                        }
+                        textBox2.Text = gelen_kutusu[dizi].alınan_mail_konu;
+                        textBox3.Text = $"{gelen_kutusu[dizi].yollayan_kisi}    --   {gelen_kutusu[dizi].mail_alma_tarhi}";
+                    }
+                    else if (button_no == 2)
+                    {
+                        bool htmlkontrol = (giden_kutusu[dizi].gonderilen_mail_icerik != HttpUtility.HtmlEncode(giden_kutusu[dizi].gonderilen_mail_icerik));
+                        tut = giden_kutusu[dizi].gonderilen_mail_icerik;
+                        if (checkBox1.Checked != true)
+                        {
+                            if (htmlkontrol == true)
+                            {
+                                string text;
+                                string convert;
+                                foreach (var x in giden_kutusu_bodyfile)
+                                {
+                                    try
+                                    {
+                                        int kontrol = tut.IndexOf("< img src", metinbaslangicIndex);
+                                        if (kontrol == -1)
+                                            kontrol = tut.IndexOf("<img src", metinbaslangicIndex);
+                                        if (kontrol == -1)
+                                            hataa = true;
+                                        if (hataa == false)
+                                        {
+                                            if (x.gonderilen_mail_no == giden_kutusu[dizi].id)
+                                            {
+                                                int deger1 = tut.IndexOf(">", kontrol) + 1;
+                                                text = tut.Substring(metinbaslangicIndex, kontrol - metinbaslangicIndex);
+                                                try
+                                                {
+                                                    convert = markupConverter.ConvertHtmlToRtf(text);
+                                                    richTextBox1.SelectedRtf = convert;
+                                                }
+                                                catch (Exception)
+                                                {
+                                                    try
+                                                    {
+                                                        convert = ConvertHtmlToText(text);
+                                                        richTextBox1.SelectedText = convert;
+                                                    }
+                                                    catch (Exception)
+                                                    {
+                                                        richTextBox1.SelectedText = text;
+                                                    }
+                                                }
+                                                metinbaslangicIndex = deger1;
+
+                                                StringBuilder ab = new StringBuilder();
+
+                                                _graphics = richTextBox1.CreateGraphics();
+                                                int picw = (int)Math.Round((x.width / _graphics.DpiX) * 2540);
+                                                int pich = (int)Math.Round((x.height / _graphics.DpiY) * 2540);
+                                                int picwgoal = (int)Math.Round((x.width / _graphics.DpiX) * 1440);
+                                                int pichgoal = (int)Math.Round((x.height / _graphics.DpiY) * 1440);
+
+                                                int rictextwgoal = (int)Math.Round((richTextBox1.Width / _graphics.DpiX) * 1440);
+                                                if (picwgoal >= rictextwgoal)
+                                                {
+                                                    picwgoal = rictextwgoal - 700;
+                                                }
+                                                string imagetortf = BitConverter.ToString(x.gonderilen_mail_bodyfile, 0).Replace("-", string.Empty);
+                                                ab.Append(@"{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fnil\fcharset0 Microsoft Sans Serif;}}
+\viewkind4\uc1\pard\f0\fs17");
+                                                ab.Append(@"{\pict\pngblip");
+                                                ab.Append(@"\picw" + picw);
+                                                ab.Append(@"\pich" + pich);
+                                                ab.Append(@"\picwgoal" + picwgoal);
+                                                ab.Append(@"\pichgoal" + pichgoal);
+                                                ab.Append(@"\hex ");
+                                                ab.Append(imagetortf + @"}\v image");
+                                                ab.Append(@"}\par}");
+                                                richTextBox1.SelectedRtf = ab.ToString();
+                                                ab.Clear();
+                                            }
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        hataa = true;
+                                    }
+                                }
+
                                 text = tut.Substring(metinbaslangicIndex, tut.Length - metinbaslangicIndex);
                                 try
                                 {
@@ -345,223 +499,197 @@ namespace mail
                                 }
                                 catch (Exception)
                                 {
-                                    richTextBox1.SelectedText = ConvertHtmlToText(text);
+                                    try
+                                    {
+                                        richTextBox1.SelectedText = ConvertHtmlToText(text);
+                                    }
+                                    catch (Exception)
+                                    {
+                                        richTextBox1.SelectedText = text;
+                                    }
                                 }
+
+                            }
+                            else
+                            {
+                                richTextBox1.Text = tut;
                             }
                         }
                         else
                         {
-                            richTextBox1.Text = ConvertHtmlToText(tut); ;
-                        }
-                    }
-                    else
-                        richTextBox1.Text = ConvertHtmlToText(gelen_kutusu[dizi].alınan_mail_icerik);
-                    //buttonla okuduğumuz mailde attachment varmı, varsa picturebox rengi değişçek
-                    listBox1.Items.Clear();
-                    if (gelen_kutusu_dosya.Count > 0)
-                    {
-                        foreach (var y in gelen_kutusu_dosya)
-                        {
-                            if (y.alınan_mail_no == gelen_kutusu[dizi].id)
-                            {
-                                listBox1.Items.Add(y.attachment_name);
-                                pictureBox3.BackColor = Color.Green;
-                                break;
-                            }
-                        }
-                    }
-                    textBox2.Text = gelen_kutusu[dizi].alınan_mail_konu;
-                    textBox3.Text = $"{gelen_kutusu[dizi].yollayan_kisi}    --   {gelen_kutusu[dizi].mail_alma_tarhi}";
-                }
-                else if(button_no == 2){
-                    if (checkBox1.Checked != true)
-                    {
-                        bool htmlkontrol = (giden_kutusu[dizi].gonderilen_mail_icerik != HttpUtility.HtmlEncode(giden_kutusu[dizi].gonderilen_mail_icerik));
-                        tut = giden_kutusu[dizi].gonderilen_mail_icerik;
-                        if (htmlkontrol == true)
-                        {
-                            string text;
-                            string convert;
-                            foreach (var x in giden_kutusu_bodyfile)
+                            if (htmlkontrol == true)
                             {
                                 try
                                 {
-                                    int kontrol = tut.IndexOf("< img src", metinbaslangicIndex);
-                                    if (kontrol == -1)
-                                        kontrol = tut.IndexOf("<img src", metinbaslangicIndex);
-                                    if (kontrol == -1)
-                                        hataa = true;
-                                    if (hataa == false)
-                                    {
-                                        if (x.gonderilen_mail_no == giden_kutusu[dizi].id)
-                                        {
-                                            int deger1 = tut.IndexOf(">", kontrol) + 1;
-                                            text = tut.Substring(metinbaslangicIndex, kontrol - metinbaslangicIndex);
-                                            convert = markupConverter.ConvertHtmlToRtf(text);
-                                            richTextBox1.SelectedRtf = convert;
-                                            metinbaslangicIndex = deger1;
-
-                                            StringBuilder ab = new StringBuilder();
-
-                                            _graphics = richTextBox1.CreateGraphics();
-                                            int picw = (int)Math.Round((x.width / _graphics.DpiX) * 2540);
-                                            int pich = (int)Math.Round((x.height / _graphics.DpiY) * 2540);
-                                            int picwgoal = (int)Math.Round((x.width / _graphics.DpiX) * 1440);
-                                            int pichgoal = (int)Math.Round((x.height / _graphics.DpiY) * 1440);
-
-                                            int rictextwgoal = (int)Math.Round((richTextBox1.Width / _graphics.DpiX) * 1440);
-                                            if (picwgoal >= rictextwgoal)
-                                            {
-                                                picwgoal = rictextwgoal - 700;
-                                            }
-                                            string imagetortf = BitConverter.ToString(x.gonderilen_mail_bodyfile, 0).Replace("-", string.Empty);
-                                            ab.Append(@"{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fnil\fcharset0 Microsoft Sans Serif;}}
-\viewkind4\uc1\pard\f0\fs17");
-                                            ab.Append(@"{\pict\pngblip");
-                                            ab.Append(@"\picw" + picw);
-                                            ab.Append(@"\pich" + pich);
-                                            ab.Append(@"\picwgoal" + picwgoal);
-                                            ab.Append(@"\pichgoal" + pichgoal);
-                                            ab.Append(@"\hex ");
-                                            ab.Append(imagetortf + @"}\v image");
-                                            ab.Append(@"}\par}");
-                                            richTextBox1.SelectedRtf = ab.ToString();
-                                            ab.Clear();
-                                        }
-                                    }
+                                    richTextBox1.Text = ConvertHtmlToText(tut);
                                 }
                                 catch (Exception)
                                 {
-                                    hataa = true;
+                                    richTextBox1.Text = tut;
                                 }
                             }
-                            if (hataa == true)
-                            {
-                                text = tut.Substring(metinbaslangicIndex, tut.Length - metinbaslangicIndex);
+                            else
+                                richTextBox1.Text = tut;
+                        }
 
-                                convert = markupConverter.ConvertHtmlToRtf(text);
-                                richTextBox1.SelectedRtf = convert;
-                            }
-                        }
-                        else
+                        //buttonla okuduğumuz mailde attachment varmı, varsa picturebox rengi değişçek
+                        listBox1.Items.Clear();
+                        if (giden_kutusu_dosya.Count > 0)
                         {
-                            richTextBox1.Text = ConvertHtmlToText(tut); ;
-                        }
-                    }
-                    else
-                        richTextBox1.Text = ConvertHtmlToText(giden_kutusu[dizi].gonderilen_mail_icerik);
-                    //buttonla okuduğumuz mailde attachment varmı, varsa picturebox rengi değişçek
-                    listBox1.Items.Clear();
-                    if (giden_kutusu_dosya.Count > 0)
-                    {
-                        foreach (var y in giden_kutusu_dosya)
-                        {
-                            if (y.gonderilen_mail_no == giden_kutusu[dizi].id)
+                            foreach (var y in giden_kutusu_dosya)
                             {
-                                pictureBox3.BackColor = Color.Green;
-                                listBox1.Items.Add(y.attachment_name);
-                                break;
+                                if (y.gonderilen_mail_no == giden_kutusu[dizi].id)
+                                {
+                                    pictureBox3.BackColor = Color.Green;
+                                    listBox1.Items.Add(y.attachment_name);
+                                }
                             }
                         }
+                        textBox2.Text = giden_kutusu[dizi].gonderilen_mail_konu;
+                        textBox3.Text = $"{login_user.Instance.Eposta}    --   {giden_kutusu[dizi].mail_yollama_tarhi}";
                     }
-                    textBox2.Text = giden_kutusu[dizi].gonderilen_mail_konu;
-                    textBox3.Text = $"{login_user.Instance.Eposta}    --   {giden_kutusu[dizi].mail_yollama_tarhi}";
-                }
-                else if(button_no == 3)
-                {
-                    if (checkBox1.Checked != true)
+                    else if (button_no == 3)
                     {
                         bool htmlkontrol = (trash_kutusu[dizi].alınan_mail_icerik != HttpUtility.HtmlEncode(trash_kutusu[dizi].alınan_mail_icerik));
                         tut = trash_kutusu[dizi].alınan_mail_icerik;
-                        if (htmlkontrol == true)
+                        if (checkBox1.Checked != true)
                         {
-                            string text;
-                            string convert;
-                            foreach (var x in trash_kutusu_bodyfile)
+                            if (htmlkontrol == true)
                             {
-                                try
+                                string text;
+                                string convert;
+                                foreach (var x in trash_kutusu_bodyfile)
                                 {
-                                    int kontrol = tut.IndexOf("< img src", metinbaslangicIndex);
-                                    if (kontrol == -1)
-                                        kontrol = tut.IndexOf("<img src", metinbaslangicIndex);
-                                    if (kontrol == -1)
-                                        hataa = true;
-                                    if (hataa == false)
+                                    try
                                     {
-                                        if (x.alınan_mail_no == trash_kutusu[dizi].id)
+                                        int kontrol = tut.IndexOf("< img src", metinbaslangicIndex);
+                                        if (kontrol == -1)
+                                            kontrol = tut.IndexOf("<img src", metinbaslangicIndex);
+                                        if (kontrol == -1)
+                                            hataa = true;
+                                        if (hataa == false)
                                         {
-                                            int deger1 = tut.IndexOf(">", kontrol) + 1;
-                                            text = tut.Substring(metinbaslangicIndex, kontrol - metinbaslangicIndex);
-                                            convert = markupConverter.ConvertHtmlToRtf(text);
-                                            richTextBox1.SelectedRtf = convert;
-                                            metinbaslangicIndex = deger1;
-
-                                            StringBuilder ab = new StringBuilder();
-
-                                            _graphics = richTextBox1.CreateGraphics();
-                                            int picw = (int)Math.Round((x.width / _graphics.DpiX) * 2540);
-                                            int pich = (int)Math.Round((x.height / _graphics.DpiY) * 2540);
-                                            int picwgoal = (int)Math.Round((x.width / _graphics.DpiX) * 1440);
-                                            int pichgoal = (int)Math.Round((x.height / _graphics.DpiY) * 1440);
-
-                                            int rictextwgoal = (int)Math.Round((richTextBox1.Width / _graphics.DpiX) * 1440);
-                                            if (picwgoal >= rictextwgoal)
+                                            if (x.alınan_mail_no == trash_kutusu[dizi].id)
                                             {
-                                                picwgoal = rictextwgoal - 700;
-                                            }
-                                            string imagetortf = BitConverter.ToString(x.alınan_mail_bodyfile, 0).Replace("-", string.Empty);
+                                                int deger1 = tut.IndexOf(">", kontrol) + 1;
+                                                text = tut.Substring(metinbaslangicIndex, kontrol - metinbaslangicIndex);
+                                                try
+                                                {
+                                                    convert = markupConverter.ConvertHtmlToRtf(text);
+                                                    richTextBox1.SelectedRtf = convert;
+                                                }
+                                                catch (Exception)
+                                                {
+                                                    try
+                                                    {
+                                                        convert = ConvertHtmlToText(text);
+                                                        richTextBox1.SelectedText = convert;
+                                                    }
+                                                    catch (Exception)
+                                                    {
+                                                        richTextBox1.SelectedText = text;
+                                                    }
+                                                }
+                                                metinbaslangicIndex = deger1;
 
-                                            ab.Append(@"{\rtf1{\pict\pngblip");
-                                            ab.Append(@"\picw" + picw);
-                                            ab.Append(@"\pich" + pich);
-                                            ab.Append(@"\picwgoal" + picwgoal);
-                                            ab.Append(@"\pichgoal" + pichgoal);
-                                            ab.Append(@"\hex ");
-                                            ab.Append(imagetortf + @"}\v image");
-                                            ab.Append(@"}\par}");
-                                            richTextBox1.SelectedRtf = ab.ToString();
-                                            ab.Clear();
+                                                StringBuilder ab = new StringBuilder();
+
+                                                _graphics = richTextBox1.CreateGraphics();
+                                                int picw = (int)Math.Round((x.width / _graphics.DpiX) * 2540);
+                                                int pich = (int)Math.Round((x.height / _graphics.DpiY) * 2540);
+                                                int picwgoal = (int)Math.Round((x.width / _graphics.DpiX) * 1440);
+                                                int pichgoal = (int)Math.Round((x.height / _graphics.DpiY) * 1440);
+
+                                                int rictextwgoal = (int)Math.Round((richTextBox1.Width / _graphics.DpiX) * 1440);
+                                                if (picwgoal >= rictextwgoal)
+                                                {
+                                                    picwgoal = rictextwgoal - 700;
+                                                }
+                                                string imagetortf = BitConverter.ToString(x.alınan_mail_bodyfile, 0).Replace("-", string.Empty);
+
+                                                ab.Append(@"{\rtf1{\pict\pngblip");
+                                                ab.Append(@"\picw" + picw);
+                                                ab.Append(@"\pich" + pich);
+                                                ab.Append(@"\picwgoal" + picwgoal);
+                                                ab.Append(@"\pichgoal" + pichgoal);
+                                                ab.Append(@"\hex ");
+                                                ab.Append(imagetortf + @"}\v image");
+                                                ab.Append(@"}\par}");
+                                                richTextBox1.SelectedRtf = ab.ToString();
+                                                ab.Clear();
+                                            }
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        hataa = true;
+                                    }
+                                }
+                                if (hataa == true)
+                                {
+                                    text = tut.Substring(metinbaslangicIndex, tut.Length - metinbaslangicIndex);
+                                    try
+                                    {
+                                        convert = markupConverter.ConvertHtmlToRtf(text);
+                                        richTextBox1.SelectedRtf = convert;
+                                    }
+                                    catch (Exception)
+                                    {
+                                        try
+                                        {
+                                            richTextBox1.SelectedText = ConvertHtmlToText(text);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            richTextBox1.SelectedText = text;
                                         }
                                     }
                                 }
-                                catch (Exception)
-                                {
-                                    hataa = true;
-                                }
                             }
-                            if (hataa == true)
+                            else
                             {
-                                text = tut.Substring(metinbaslangicIndex, tut.Length - metinbaslangicIndex);
-
-                                convert = markupConverter.ConvertHtmlToRtf(text);
-                                richTextBox1.SelectedRtf = convert;
+                                richTextBox1.Text = tut;
                             }
                         }
                         else
                         {
-                            richTextBox1.Text = ConvertHtmlToText(tut); ;
-                        }
-                    }
-                    else
-                        richTextBox1.Text = ConvertHtmlToText(trash_kutusu[dizi].alınan_mail_icerik);
-                    //buttonla okuduğumuz mailde attachment varmı, varsa picturebox rengi değişçek
-                    listBox1.Items.Clear();
-                    if (trash_kutusu_dosya.Count > 0)
-                    {
-                        foreach (var y in trash_kutusu_dosya)
-                        {
-                            if (y.alınan_mail_no == trash_kutusu[dizi].id)
+                            if (htmlkontrol == true)
                             {
-                                pictureBox3.BackColor = Color.Green;
-                                listBox1.Items.Add(y.attachment_name);
-                                break;
+                                try
+                                {
+                                    richTextBox1.Text = ConvertHtmlToText(tut);
+                                }
+                                catch (Exception)
+                                {
+                                    richTextBox1.Text = tut;
+                                }
+                            }
+                            else
+                                richTextBox1.Text = tut;
+                        }
+
+
+                        //buttonla okuduğumuz mailde attachment varmı, varsa picturebox rengi değişçek
+                        listBox1.Items.Clear();
+                        if (trash_kutusu_dosya.Count > 0)
+                        {
+                            foreach (var y in trash_kutusu_dosya)
+                            {
+                                if (y.alınan_mail_no == trash_kutusu[dizi].id)
+                                {
+                                    pictureBox3.BackColor = Color.Green;
+                                    listBox1.Items.Add(y.attachment_name);
+                                }
                             }
                         }
+                        textBox2.Text = trash_kutusu[dizi].alınan_mail_konu;
+                        textBox3.Text = $"{trash_kutusu[dizi].yollayan_kisi}    --   {trash_kutusu[dizi].mail_alma_tarhi}";
                     }
-                    textBox2.Text = trash_kutusu[dizi].alınan_mail_konu;
-                    textBox3.Text = $"{trash_kutusu[dizi].yollayan_kisi}    --   {trash_kutusu[dizi].mail_alma_tarhi}";
                 }
-            }   
+            }
+            catch (Exception)
+            {
+            }
         }
 
         int toplam_mesaj_giden;
@@ -575,123 +703,129 @@ namespace mail
                 {
                     if (NetworkInterface.GetIsNetworkAvailable() == true)
                     {
-                        using (var client = new ImapClient())
+                        if(backgroundWorker1.IsBusy != true)
                         {
-                            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-                            client.Connect("imap.gmail.com", 993, SecureSocketOptions.SslOnConnect);
-                            client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
-                            if (button_no == 1)
+                            try
                             {
-                                var inbox = client.Inbox;
-                                inbox.Open(FolderAccess.ReadWrite);
-                                var item = (mail_get_user)listBox2.SelectedValue;
-                                for (int i = 0; i < gelen_kutusu.Count; i++)
+                                using (var client = new ImapClient())
                                 {
-                                    if (item.id == gelen_kutusu[i].id)
-                                    {
-                                        var matchFolder = client.GetFolder(SpecialFolder.Trash);
-                                        if (matchFolder != null)
-                                            inbox.MoveTo(i, matchFolder);
-                                        inbox.Expunge();
-                                        inbox.Close();
-                                        listBox2.DataSource = null;
-                                        kp3.form3_secilen_degeri_sil_1(item.id, gelen_kutusu, gelen_kutusu_dosya, gelen_kutusu_bodyfile);        //silmek yerine databasede silinenlere ekle dicez
-                                        gelen_kutusu.Remove(item);
-                                        listBox2.DataSource = gelen_kutusu;
-                                        listBox2.DisplayMember = "tam_deger";
-                                        label2.Text = $"Total: {gelen_kutusu.Count}";
-                                        client.Disconnect(true);
-                                        break;
-                                    }
-                                }
-                            }
+                                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                                    client.Connect("imap.gmail.com", 993, SecureSocketOptions.SslOnConnect);
+                                    client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
 
-                            else if (button_no == 2)
-                            {
-                                var inbox = client.GetFolder(SpecialFolder.Sent);
-                                inbox.Open(FolderAccess.ReadWrite);
-                                var item = (mail_send_user)listBox2.SelectedValue;
-                                for (int i = 0; i < giden_kutusu.Count; i++)
-                                {
-                                    if (item.id == giden_kutusu[i].id)
+                                    if (button_no == 1)
                                     {
-                                        var matchFolder = client.GetFolder(SpecialFolder.Trash);
-                                        if (matchFolder != null)
-                                            inbox.MoveTo(i, matchFolder);
-                                        inbox.Expunge();
-                                        inbox.Close();
-                                        listBox2.DataSource = null;
-                                        kp3.form3_secilen_degeri_sil_2(item.id, giden_kutusu, giden_kutusu_dosya, giden_kutusu_bodyfile);        //silmek yerine databasede silinenlere ekle dicez
-                                        giden_kutusu.Remove(item);
-                                        listBox2.DataSource = giden_kutusu;
-                                        listBox2.DisplayMember = "tam_deger";
-                                        label2.Text = $"Total: {giden_kutusu.Count}";
-                                        client.Disconnect(true);
-                                        break;
+                                        var inbox = client.Inbox;
+                                        inbox.Open(FolderAccess.ReadWrite);
+                                        IList<UniqueId> uids = inbox.Search(SearchQuery.All);
+                                        var item = (mail_get_user)listBox2.SelectedValue;
+                                        for (int i = 0; i < gelen_kutusu.Count; i++)
+                                        {
+                                            if (item.id == gelen_kutusu[i].id)
+                                            {
+                                                int u = gelen_kutusu.Count - 1 - i;
+                                                var matchFolder = client.GetFolder(SpecialFolder.Trash);
+                                                if (matchFolder != null)
+                                                    inbox.MoveTo(uids[u], matchFolder);
+                                                inbox.Expunge();
+                                                inbox.Close();
+                                                listBox2.DataSource = null;
+                                                kp3.form3_secilen_degeri_sil_1(item.id, gelen_kutusu, gelen_kutusu_dosya, gelen_kutusu_bodyfile);        //silmek yerine databasede silinenlere ekle dicez
+                                                gelen_kutusu.Remove(item);
+                                                listBox2.DataSource = gelen_kutusu;
+                                                listBox2.DisplayMember = "tam_deger";
+                                                label2.Text = $"Total: {gelen_kutusu.Count}";
+                                                client.Disconnect(true);
+                                            }
+                                        }
                                     }
-                                }
-                            }
 
-                            else if (button_no == 3)
-                            {
-                                var inbox = client.GetFolder(SpecialFolder.Trash);
-                                inbox.Open(FolderAccess.ReadWrite);
-                                var items = (List<trash_get_user>)listBox2.DataSource;
-                                var item = (trash_get_user)listBox2.SelectedValue;
-                                for (int i = 0; i < trash_kutusu.Count; i++)
-                                {
-                                    if (item.id == trash_kutusu[i].id)
+                                    else if (button_no == 2)
                                     {
-                                        inbox.AddFlags(i, MessageFlags.Deleted, true);
-                                        inbox.Expunge();
-                                        inbox.Close();
-                                        listBox2.DataSource = null;
-                                        items.Remove(item);
-                                        listBox2.DataSource = items;
-                                        listBox2.DisplayMember = "tam_deger";
-                                        label2.Text = $"Total: {items.Count}";
-                                        kp3.form3_secilen_degeri_sil_3(item.id);        //tamemen silme işlemi
-                                        break;
+                                        var inbox = client.GetFolder(SpecialFolder.Sent);
+                                        inbox.Open(FolderAccess.ReadWrite);
+                                        IList<UniqueId> uids = inbox.Search(SearchQuery.All);
+                                        var item = (mail_send_user)listBox2.SelectedValue;
+                                        for (int i = 0; i < giden_kutusu.Count-1; i++)
+                                        {
+                                            if (item.id == giden_kutusu[i].id)
+                                            {
+                                                int u = giden_kutusu.Count - 1 - i;
+                                                var matchFolder = client.GetFolder(SpecialFolder.Trash);
+                                                if (matchFolder != null)
+                                                    inbox.MoveTo(uids[u], matchFolder);
+                                                inbox.Expunge();
+                                                inbox.Close();
+                                                listBox2.DataSource = null;
+                                                kp3.form3_secilen_degeri_sil_2(item.id, giden_kutusu, giden_kutusu_dosya, giden_kutusu_bodyfile);     
+                                                giden_kutusu.Remove(item);
+                                                listBox2.DataSource = giden_kutusu;
+                                                listBox2.DisplayMember = "tam_deger";
+                                                label2.Text = $"Total: {giden_kutusu.Count}";
+                                                client.Disconnect(true);
+                                            }
+                                        }
+                                    }
+
+                                    else if (button_no == 3)
+                                    {
+                                        var inbox = client.GetFolder(SpecialFolder.Trash);
+                                        inbox.Open(FolderAccess.ReadWrite);
+                                        IList<UniqueId> uids = inbox.Search(SearchQuery.All);
+                                        var item = (trash_get_user)listBox2.SelectedValue;
+                                        for (int i = 0; i < trash_kutusu.Count-1; i++)
+                                        {
+                                            if (item.id == trash_kutusu[i].id)
+                                            {
+                                                int u = trash_kutusu.Count - 1 - i;
+                                                inbox.AddFlags(uids[u], MessageFlags.Deleted, true);
+                                                inbox.Expunge();
+                                                inbox.Close();
+                                                listBox2.DataSource = null;
+                                                kp3.form3_secilen_degeri_sil_3(item.id);  
+                                                trash_kutusu.Remove(item);
+                                                listBox2.DataSource = trash_kutusu;
+                                                listBox2.DisplayMember = "tam_deger";
+                                                label2.Text = $"Total: {trash_kutusu.Count}";
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            catch (Exception) {  }
                         }
-
                     }
                     else
                     {
                         if(button_no == 1)
                         {
-                            var items = (List<mail_get_user>)listBox2.DataSource;
                             var item = (mail_get_user)listBox2.SelectedValue;
                             listBox2.DataSource = null;
-                            items.Remove(item);
-                            listBox2.DataSource = items;
+                            kp3.form3_secilen_degeri_sil_1(item.id, gelen_kutusu, gelen_kutusu_dosya, gelen_kutusu_bodyfile);
+                            gelen_kutusu.Remove(item);
+                            listBox2.DataSource = gelen_kutusu;
                             listBox2.DisplayMember = "tam_deger";
-                            label2.Text = $"Total: {items.Count}";
-                            kp3.form3_secilen_degeri_sil_1(item.id, items, gelen_kutusu_dosya, gelen_kutusu_bodyfile);
+                            label2.Text = $"Total: {gelen_kutusu.Count}";
                         }
                         else if(button_no == 2)
                         {
-                            var items = (List<mail_send_user>)listBox2.DataSource;
                             var item = (mail_send_user)listBox2.SelectedValue;
                             listBox2.DataSource = null;
-                            items.Remove(item);
-                            listBox2.DataSource = items;
+                            kp3.form3_secilen_degeri_sil_2(item.id, giden_kutusu, giden_kutusu_dosya, giden_kutusu_bodyfile);
+                            giden_kutusu.Remove(item);
+                            listBox2.DataSource = giden_kutusu;
                             listBox2.DisplayMember = "tam_deger";
-                            label2.Text = $"Total: {items.Count}";
-                            kp3.form3_secilen_degeri_sil_2(item.id, items, giden_kutusu_dosya, giden_kutusu_bodyfile);
+                            label2.Text = $"Total: {giden_kutusu.Count}";
                         }
                         else if (button_no == 3)
                         {
-                            var items = (List<trash_get_user>)listBox2.DataSource;
                             var item = (trash_get_user)listBox2.SelectedValue;
                             listBox2.DataSource = null;
-                            items.Remove(item);
-                            listBox2.DataSource = items;
-                            listBox2.DisplayMember = "tam_deger";
-                            label2.Text = $"Total: {items.Count}";
                             kp3.form3_secilen_degeri_sil_3(item.id);
+                            trash_kutusu.Remove(item);
+                            listBox2.DataSource = trash_kutusu;
+                            listBox2.DisplayMember = "tam_deger";
+                            label2.Text = $"Total: {trash_kutusu.Count}";
 
                         }
                     }
@@ -702,7 +836,6 @@ namespace mail
                     trash_kutusu = kp3.form3_db_cekme_islemler_trash_mail();
                     trash_kutusu_bodyfile = kp3.form3_db_cekme_islemler_trash_mail_bodyfile();
                     trash_kutusu_dosya = kp3.form3_db_cekme_islemler_trash_mail_attachment();
-                    //trash kutusu yenilemek için
                 }
             }
         }
@@ -720,57 +853,6 @@ namespace mail
         {
             System.Diagnostics.Process.Start(e.LinkText);
         }
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            if(button_no == 1)
-            {
-                List<mail_get_user> results = gelen_kutusu.FindAll(x => x.tam_deger.Contains(textBox1.Text));
-
-                if (textBox1.Text == "")
-                {
-                    listBox2.DataSource = gelen_kutusu;
-                    listBox2.DisplayMember = "tam_deger";
-                }
-                else
-                {
-                    listBox2.DataSource = results;
-                    listBox2.DisplayMember = "tam_deger";
-                }
-            }
-            else if(button_no == 2)
-            {
-                List<mail_send_user> results = giden_kutusu.FindAll(x => x.tam_deger.Contains(textBox1.Text));
-
-                if (textBox1.Text == "")
-                {
-                    listBox2.DataSource = giden_kutusu;
-                    listBox2.DisplayMember = "tam_deger";
-                }
-                else
-                {
-                    listBox2.DataSource = results;
-                    listBox2.DisplayMember = "tam_deger";
-                }
-            }
-            else if (button_no == 3)
-            {
-                List<trash_get_user> results = trash_kutusu.FindAll(x => x.tam_deger.Contains(textBox1.Text));
-
-                if (textBox1.Text == "")
-                {
-                    listBox2.DataSource = trash_kutusu;
-                    listBox2.DisplayMember = "tam_deger";
-                }
-                else
-                {
-                    listBox2.DataSource = results;
-                    listBox2.DisplayMember = "tam_deger";
-                }
-            }
-        }
-
-
-
 
 
 
@@ -779,18 +861,21 @@ namespace mail
         List<mail_bodyfile_tut> mail_bodyfile_tut = new List<mail_bodyfile_tut>();
         List<mail_attachment_tut> mail_attachment_tut = new List<mail_attachment_tut>();
 
-
         int toplam_mesaj;
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs evnt)
         {
+            button3.BorderColor = Color.Red;
+            button10.BorderColor = Color.Red;
             using (var client = new ImapClient())
             {
+                backgroundWorker1.ReportProgress(0);
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                 client.Connect("imap.gmail.com", 993, SecureSocketOptions.SslOnConnect);
 
                 client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
                 IMailFolder inbox = null;
+                backgroundWorker1.ReportProgress(10);
                 for (int i =1; i<4; i++)
                 {
                     //inbox.close() gereksiz - sunucu otomatik olarak eski klasörü kapatıyor. https://stackoverflow.com/questions/29490638/mailkit-imailfolder-close-throws-exception  - jstedfast 12/06/2021 18:15
@@ -803,8 +888,11 @@ namespace mail
                         gelen_kutusu_bodyfile.Clear();
                         gelen_kutusu_dosya.Clear();
                         gelen_kutusu = kp3.form3_db_cekme_islemler_gelen_mail();
+                        backgroundWorker1.ReportProgress(20);
                         gelen_kutusu_bodyfile = kp3.form3_db_cekme_islemler_gelen_mail_bodyfile();
+                        backgroundWorker1.ReportProgress(30);
                         gelen_kutusu_dosya = kp3.form3_db_cekme_islemler_gelen_mail_attachment();
+                        backgroundWorker1.ReportProgress(40);
                     }
                     if(i==2)
                     {
@@ -815,8 +903,11 @@ namespace mail
                         giden_kutusu_bodyfile.Clear();
                         giden_kutusu_dosya.Clear();
                         giden_kutusu = kp3.form3_db_cekme_islemler_giden_mail();
+                        backgroundWorker1.ReportProgress(50);
                         giden_kutusu_bodyfile = kp3.form3_db_cekme_islemler_giden_mail_bodyfile();
+                        backgroundWorker1.ReportProgress(60);
                         giden_kutusu_dosya = kp3.form3_db_cekme_islemler_giden_mail_attachment();
+                        backgroundWorker1.ReportProgress(70);
                     }
                     if (i == 3)
                     {
@@ -827,8 +918,11 @@ namespace mail
                         trash_kutusu_bodyfile.Clear();
                         trash_kutusu_dosya.Clear();
                         trash_kutusu = kp3.form3_db_cekme_islemler_trash_mail();
+                        backgroundWorker1.ReportProgress(80);
                         trash_kutusu_bodyfile = kp3.form3_db_cekme_islemler_trash_mail_bodyfile();
+                        backgroundWorker1.ReportProgress(90);
                         trash_kutusu_dosya = kp3.form3_db_cekme_islemler_trash_mail_attachment();
+                        backgroundWorker1.ReportProgress(100);
                     }
                 }
                 client.Disconnect(true);
@@ -836,117 +930,122 @@ namespace mail
         }
         public void get_mails(IMailFolder folder, ImapClient client)
         {
-            mail_tut.Clear();
-            mail_bodyfile_tut.Clear();
-            mail_attachment_tut.Clear();
-            int id = 1;
-            folder.Open(FolderAccess.ReadOnly);
-            toplam_mesaj = folder.Count;
-            if (folder == client.GetFolder(SpecialFolder.Sent))
-                toplam_mesaj_giden = toplam_mesaj;
-            if (folder == client.Inbox)
-                toplam_mesaj_gelen = toplam_mesaj;
-            if (folder == client.GetFolder(SpecialFolder.Trash))
-                toplam_mesaj_trash = toplam_mesaj;
-            string text;
-            IList<UniqueId> uids = folder.Search(SearchQuery.All);
-            foreach (UniqueId uid in uids)
+            try
             {
-                MimeMessage message = folder.GetMessage(uid);
-                if (message.HtmlBody != null)
+                mail_tut.Clear();
+                mail_bodyfile_tut.Clear();
+                mail_attachment_tut.Clear();
+                int id = 1;
+                folder.Open(FolderAccess.ReadOnly);
+                toplam_mesaj = folder.Count;
+                if (folder == client.GetFolder(SpecialFolder.Sent))
+                    toplam_mesaj_giden = toplam_mesaj;
+                if (folder == client.Inbox)
+                    toplam_mesaj_gelen = toplam_mesaj;
+                if (folder == client.GetFolder(SpecialFolder.Trash))
+                    toplam_mesaj_trash = toplam_mesaj;
+                string text;
+                IList<UniqueId> uids = folder.Search(SearchQuery.All);
+                foreach (UniqueId uid in uids)
                 {
-                    text = message.HtmlBody;
-                    string tut = text.Replace(" ", "");  //değer alacağımızdan boşlukların bir önemi yok
-                    foreach (MimePart att in message.BodyParts)
+                    MimeMessage message = folder.GetMessage(uid);
+                    if (message.HtmlBody != null)
                     {
-                        if (att.ContentId != null && att.Content != null && att.ContentType.MediaType == "image" && (text.IndexOf("cid:" + att.ContentId) > -1))
+                        text = message.HtmlBody;
+                        string tut = text.Replace(" ", "");  //değer alacağımızdan boşlukların bir önemi yok
+                        foreach (MimePart att in message.BodyParts)
                         {
-                            byte[] b;
-                            using (var mem = new MemoryStream())
+                            if (att.ContentId != null && att.Content != null && att.ContentType.MediaType == "image" && (text.IndexOf("cid:" + att.ContentId) > -1))
                             {
-                                att.Content.DecodeTo(mem);
-                                b = mem.ToArray();
-                            }
-                            int resim_width=0, resim_height=0;
-                            bool hata_tut = false;
-                            int deger1 = -1;
-                            try 
-                            {
-                                deger1 = tut.IndexOf(@"<imgsrc=""cid:");
-                                int deger3 = tut.IndexOf("width=", deger1) + 6;
-                                int deger4 = tut.IndexOf("height=", deger3);
-                                resim_width = Convert.ToInt32(tut.Substring(deger3, deger4 - deger3).Replace(@"""",""));
-
-                                int deger5 = tut.IndexOf(@"height=", deger1) + 7;
-                                int deger6 = tut.IndexOf(">", deger5);
-                                resim_height = Convert.ToInt32(tut.Substring(deger5, deger6 - deger5).Replace(@"""", ""));
-                            }
-                            catch (Exception)
-                            {
-                                hata_tut = true;
-                            }
-                            if (deger1 != -1)
-                            {
-                                if (hata_tut == false)
+                                byte[] b;
+                                using (var mem = new MemoryStream())
                                 {
-                                    mail_bodyfile_tut.Add(new mail_bodyfile_tut
-                                    {
-                                        id = id,
-                                        alınan_mail_bodyfile = b,
-                                        width = resim_width,
-                                        height = resim_height
-                                    });
+                                    att.Content.DecodeTo(mem);
+                                    b = mem.ToArray();
                                 }
-                                int deger7 = tut.IndexOf(@"height=", deger1);
-                                int deger8 = tut.IndexOf(@">", deger7) + 1;
-                                string html_imagecode = tut.Substring(deger1, deger8 - deger1);
-                                tut = tut.Replace(html_imagecode, string.Empty);
+                                int resim_width = 0, resim_height = 0;
+                                bool hata_tut = false;
+                                int deger1 = -1;
+                                try
+                                {
+                                    deger1 = tut.IndexOf(@"<imgsrc=""cid:");
+                                    int deger3 = tut.IndexOf("width=", deger1) + 6;
+                                    int deger4 = tut.IndexOf("height=", deger3);
+                                    resim_width = Convert.ToInt32(tut.Substring(deger3, deger4 - deger3).Replace(@"""", ""));
+
+                                    int deger5 = tut.IndexOf(@"height=", deger1) + 7;
+                                    int deger6 = tut.IndexOf(">", deger5);
+                                    resim_height = Convert.ToInt32(tut.Substring(deger5, deger6 - deger5).Replace(@"""", ""));
+                                }
+                                catch (Exception)
+                                {
+                                    hata_tut = true;
+                                }
+                                if (deger1 != -1)
+                                {
+                                    if (hata_tut == false)
+                                    {
+                                        mail_bodyfile_tut.Add(new mail_bodyfile_tut
+                                        {
+                                            id = id,
+                                            alınan_mail_bodyfile = b,
+                                            width = resim_width,
+                                            height = resim_height
+                                        });
+                                    }
+                                    int deger7 = tut.IndexOf(@"height=", deger1);
+                                    int deger8 = tut.IndexOf(@">", deger7) + 1;
+                                    string html_imagecode = tut.Substring(deger1, deger8 - deger1);
+                                    tut = tut.Replace(html_imagecode, string.Empty);
+                                }
+                                else
+                                    hataa = true;
                             }
-                            else
-                                hataa = true;
                         }
                     }
-                }
 
-                else if (message.TextBody != null)
-                    text = message.TextBody;
-                else
-                    text = string.Empty;
-                mail_tut.Add(new mail_tut
-                {
-                    id = id,
-                    baslik = message.Subject,
-                    icerik = text,
-                    tarih = (DateTimeOffset)message.Date,
-                    yollayan = message.From.ToString(),
-                });
-                if(message.Attachments != null)
-                {
-                    foreach(var attachment in message.Attachments) {
-                        using (var stream = new MemoryStream())
+                    else if (message.TextBody != null)
+                        text = message.TextBody;
+                    else
+                        text = string.Empty;
+                    mail_tut.Add(new mail_tut
+                    {
+                        id = id,
+                        baslik = message.Subject,
+                        icerik = text,
+                        tarih = (DateTimeOffset)message.Date,
+                        yollayan = message.From.ToString(),
+                    });
+                    if (message.Attachments != null)
+                    {
+                        foreach (var attachment in message.Attachments)
                         {
-                            var part = (MimePart)attachment;
-
-                            part.Content.DecodeTo(stream);
-
-                            byte[] byt = stream.ToArray();
-                            mail_attachment_tut.Add(new mail_attachment_tut
+                            using (var stream = new MemoryStream())
                             {
-                                alınan_mail_attachment = byt,
-                                id = id,
-                                attachment_name = part.FileName
-                            });
-                        }
+                                var part = (MimePart)attachment;
 
+                                part.Content.DecodeTo(stream);
+
+                                byte[] byt = stream.ToArray();
+                                mail_attachment_tut.Add(new mail_attachment_tut
+                                {
+                                    alınan_mail_attachment = byt,
+                                    id = id,
+                                    attachment_name = part.FileName
+                                });
+                            }
+
+                        }
                     }
+                    id++;
                 }
-                id++;
             }
+            catch (Exception) { }
 
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            label1.Text = "Mailler Güncellendi...";
+            label1.Text = "Mailler Güncellendi !!";
             if (button_no == 1)
             {
                 label2.Text = $"Total: {toplam_mesaj_gelen}";
@@ -970,6 +1069,8 @@ namespace mail
             }
             basıldımı = false;
             button6.BorderColor = Color.Black;
+            button3.BorderColor = Color.Black;
+            button10.BorderColor = Color.Black;
         }
 
 
@@ -978,67 +1079,73 @@ namespace mail
         bool okundumu = false;
         private void button9_Click(object sender, EventArgs e)
         {
-            if(okundumu == true)
+            try
             {
-                if (button_no == 1)
+                if (okundumu == true)
                 {
-                    if (listBox2.SelectedItems.Count > 0)
+                    if (button_no == 1)
                     {
-                        foreach (var x in gelen_kutusu_dosya)
+                        if (listBox2.SelectedItems.Count > 0)
                         {
-                            if (gelen_kutusu[dizi].id == x.alınan_mail_no)
+                            foreach (var x in gelen_kutusu_dosya)
                             {
-                                SaveFileDialog file = new SaveFileDialog();
-                                file.FileName = x.attachment_name;
-                                if (file.FileName != "" && file.ShowDialog() == DialogResult.OK)
+                                if (gelen_kutusu[dizi].id == x.alınan_mail_no)
                                 {
-                                    string dosya_byte = BitConverter.ToString(x.alınan_mail_dosyalar, 0).Replace("-", string.Empty);
-                                    File.WriteAllBytes(file.FileName, x.alınan_mail_dosyalar);
+                                    SaveFileDialog file = new SaveFileDialog();
+                                    file.FileName = x.attachment_name;
+                                    if (file.FileName != "" && file.ShowDialog() == DialogResult.OK)
+                                    {
+                                        string dosya_byte = BitConverter.ToString(x.alınan_mail_dosyalar, 0).Replace("-", string.Empty);
+                                        File.WriteAllBytes(file.FileName, x.alınan_mail_dosyalar);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                else if(button_no == 2)
-                {
-                    if (listBox2.SelectedItems.Count > 0)
+                    else if (button_no == 2)
                     {
-                        foreach (var x in giden_kutusu_dosya)
+                        if (listBox2.SelectedItems.Count > 0)
                         {
-                            if (giden_kutusu[dizi].id == x.gonderilen_mail_no)
+                            foreach (var x in giden_kutusu_dosya)
                             {
-                                SaveFileDialog file = new SaveFileDialog();
-                                file.FileName = x.attachment_name;
+                                if (giden_kutusu[dizi].id == x.gonderilen_mail_no)
+                                {
+                                    SaveFileDialog file = new SaveFileDialog();
+                                    file.FileName = x.attachment_name;
 
-                                if (file.FileName != "" && file.ShowDialog() == DialogResult.OK)
-                                {
-                                    string dosya_byte = BitConverter.ToString(x.gonderilen_mail_dosyalar, 0).Replace("-", string.Empty);
-                                    File.WriteAllBytes(file.FileName, x.gonderilen_mail_dosyalar);
+                                    if (file.FileName != "" && file.ShowDialog() == DialogResult.OK)
+                                    {
+                                        string dosya_byte = BitConverter.ToString(x.gonderilen_mail_dosyalar, 0).Replace("-", string.Empty);
+                                        File.WriteAllBytes(file.FileName, x.gonderilen_mail_dosyalar);
+                                    }
                                 }
                             }
                         }
-                    }
 
-                }
-                else if (button_no == 3)
-                {
-                    if (listBox2.SelectedItems.Count > 0)
+                    }
+                    else if (button_no == 3)
                     {
-                        foreach (var x in trash_kutusu_dosya)
+                        if (listBox2.SelectedItems.Count > 0)
                         {
-                            if (trash_kutusu[dizi].id == x.alınan_mail_no)
+                            foreach (var x in trash_kutusu_dosya)
                             {
-                                SaveFileDialog file = new SaveFileDialog();
-                                file.FileName = x.attachment_name;
-                                if (file.FileName != "" && file.ShowDialog() == DialogResult.OK)
+                                if (trash_kutusu[dizi].id == x.alınan_mail_no)
                                 {
-                                    string dosya_byte = BitConverter.ToString(x.alınan_mail_dosyalar, 0).Replace("-", string.Empty);
-                                    File.WriteAllBytes(file.FileName, x.alınan_mail_dosyalar);
+                                    SaveFileDialog file = new SaveFileDialog();
+                                    file.FileName = x.attachment_name;
+                                    if (file.FileName != "" && file.ShowDialog() == DialogResult.OK)
+                                    {
+                                        string dosya_byte = BitConverter.ToString(x.alınan_mail_dosyalar, 0).Replace("-", string.Empty);
+                                        File.WriteAllBytes(file.FileName, x.alınan_mail_dosyalar);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }
+            catch (Exception)
+            {
             }
         }
         bool basıldımı = false;
@@ -1049,13 +1156,17 @@ namespace mail
             {
                 if (NetworkInterface.GetIsNetworkAvailable() == true)
                 {
-                    label1.Text = "Mailler güncelleniyor...";
-                    button6.BorderColor = Color.Red;
-                    backgroundWorker1.RunWorkerAsync();
-                    basıldımı = true;
+                    if(backgroundWorker1.IsBusy == false)
+                    {
+                        basıldımı = true;
+                        label1.Text = "Mailler güncelleniyor...";
+                        button6.BorderColor = Color.DarkGreen;
+                        backgroundWorker1.RunWorkerAsync();
+                    }
                 }
                 else
                 {
+                    label1.Text = "Mailler güncelleniyor  -  0%";
                     gelen_kutusu.Clear();
                     gelen_kutusu_bodyfile.Clear();
                     gelen_kutusu_dosya.Clear();
@@ -1065,17 +1176,21 @@ namespace mail
                     trash_kutusu.Clear();
                     trash_kutusu_bodyfile.Clear();
                     trash_kutusu_dosya.Clear();
-                    button6.BorderColor = Color.Red; 
+                    button6.BorderColor = Color.DarkGreen;
                     gelen_kutusu = kp3.form3_db_cekme_islemler_gelen_mail();
                     gelen_kutusu_bodyfile = kp3.form3_db_cekme_islemler_gelen_mail_bodyfile();
                     gelen_kutusu_dosya = kp3.form3_db_cekme_islemler_gelen_mail_attachment();
+                    label1.Text = "Mailler güncelleniyor  -   35%";
                     giden_kutusu = kp3.form3_db_cekme_islemler_giden_mail();
                     giden_kutusu_bodyfile = kp3.form3_db_cekme_islemler_giden_mail_bodyfile();
                     giden_kutusu_dosya = kp3.form3_db_cekme_islemler_giden_mail_attachment();
+                    label1.Text = "Mailler güncelleniyor  -   75%";
                     trash_kutusu = kp3.form3_db_cekme_islemler_trash_mail();
                     trash_kutusu_bodyfile = kp3.form3_db_cekme_islemler_trash_mail_bodyfile();
                     trash_kutusu_dosya = kp3.form3_db_cekme_islemler_trash_mail_attachment();
+                    label1.Text = "Mailler güncelleniyor  -   100%";
                     button6.BorderColor = Color.Black;
+                    label1.Text = "Mailler Güncellendi !!";
                 }
             }
         }
@@ -1083,6 +1198,7 @@ namespace mail
         private void button8_Click(object sender, EventArgs e)
         {
             button_no = 3;
+            label3.Text = "Çöp Kutusu:";
             label2.Text = $"Total: {trash_kutusu.Count}";
             listBox2.DataSource = null;
             listBox2.DataSource = trash_kutusu;
@@ -1092,6 +1208,7 @@ namespace mail
         private void button7_Click(object sender, EventArgs e)
         {
             button_no = 2;
+            label3.Text = "Giden Kutusu:";
             label2.Text = $"Total: {giden_kutusu.Count}";
             listBox2.DataSource = null;
             listBox2.DataSource = giden_kutusu;
@@ -1104,77 +1221,81 @@ namespace mail
             {
                 if (listBox2.SelectedValue != null)
                 {
-                    if (NetworkInterface.GetIsNetworkAvailable() == true)
+                    try
                     {
-                            if (button_no == 3)
+                        if (NetworkInterface.GetIsNetworkAvailable() == true)
+                        {
+                            if(backgroundWorker1.IsBusy != true)
                             {
-                            MessageBox.Show("Adım 1");
-                            using (var client = new ImapClient())
-                            {
-                                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-                                client.Connect("imap.gmail.com", 993, SecureSocketOptions.SslOnConnect);
-                                client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
-                                var inbox = client.GetFolder(SpecialFolder.Trash);
-                                inbox.Open(FolderAccess.ReadWrite);
-                                var item = (trash_get_user)listBox2.SelectedValue;
-                                for (int i = 0; i < trash_kutusu.Count; i++)
+                                if (button_no == 3)
                                 {
-                                    MessageBox.Show("Adım 2");
-                                    if (item.id == trash_kutusu[i].id)
+                                    using (var client = new ImapClient())
                                     {
-                                        MessageBox.Show("Adım 3");
-                                        if (item.yollayan_kisi == login_user.Instance.Eposta)
+                                        client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                                        client.Connect("imap.gmail.com", 993, SecureSocketOptions.SslOnConnect);
+                                        client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
+                                        var inbox = client.GetFolder(SpecialFolder.Trash);
+                                        inbox.Open(FolderAccess.ReadWrite);
+                                        IList<UniqueId> uids = inbox.Search(SearchQuery.All);
+                                        var item = (trash_get_user)listBox2.SelectedValue;
+                                        for (int i = 0; i < trash_kutusu.Count; i++)
                                         {
-                                            MessageBox.Show("Adım 4");
-                                            var matchFolder = client.GetFolder(SpecialFolder.Sent);
-                                            if (matchFolder != null)
-                                                inbox.MoveTo(i, matchFolder);
-                                            kp3.form3_secilen_degeri_geri_yukle_2(item.id, trash_kutusu, trash_kutusu_dosya, trash_kutusu_bodyfile);
-                                        }
-                                        else
-                                        {
-                                            MessageBox.Show("Adım 5");
-                                            MessageBox.Show(""+i+"  "+ item.id );
+                                            if (item.id == trash_kutusu[i].id)
+                                            {
+                                                int u = trash_kutusu.Count - 1 - i;
+                                                if (item.yollayan_kisi == login_user.Instance.Eposta)
+                                                {
+                                                    var matchFolder = client.GetFolder(SpecialFolder.Sent);
+                                                    if (matchFolder != null)
+                                                        inbox.MoveTo(uids[u], matchFolder);
+                                                    kp3.form3_secilen_degeri_geri_yukle_2(item.id, trash_kutusu, trash_kutusu_dosya, trash_kutusu_bodyfile);
+                                                }
+                                                else
+                                                {
+                                                    var matchFolder = client.Inbox;
+                                                    if (matchFolder != null)
+                                                        inbox.MoveTo(uids[u], matchFolder);
+                                                    kp3.form3_secilen_degeri_geri_yukle_1(item.id, trash_kutusu, trash_kutusu_dosya, trash_kutusu_bodyfile);
+                                                }
+                                                inbox.Expunge();
+                                                inbox.Close();
+                                                listBox2.DataSource = null;
+                                                kp3.form3_secilen_degeri_sil_3(item.id);
+                                                trash_kutusu.Remove(item);
+                                                listBox2.DataSource = trash_kutusu;
+                                                listBox2.DisplayMember = "tam_deger";
+                                                label2.Text = $"Total: {trash_kutusu.Count}";
+                                            }
 
-                                            var matchFolder = client.Inbox;
-                                            if (matchFolder != null)
-                                                inbox.MoveTo(i, matchFolder);
-                                            kp3.form3_secilen_degeri_geri_yukle_1(item.id, trash_kutusu, trash_kutusu_dosya, trash_kutusu_bodyfile);
                                         }
-                                        inbox.Expunge();
-                                        inbox.Close();
-                                        listBox2.DataSource = null;
-                                        trash_kutusu.Remove(item);
-                                        listBox2.DataSource = trash_kutusu;
-                                        listBox2.DisplayMember = "tam_deger";
-                                        label2.Text = $"Total: {trash_kutusu.Count}";
-                                        kp3.form3_secilen_degeri_sil_3(item.id);
-                                        MessageBox.Show("Adım 6");
-                                        break;
                                     }
-
                                 }
                             }
-                        }
 
-                    }
-                    else
-                    {
-                        if (button_no == 3)
+                        }
+                        else
                         {
-                            var items = (List<trash_get_user>)listBox2.DataSource;
-                            var item = (trash_get_user)listBox2.SelectedValue;
-                            listBox2.DataSource = null;
-                            items.Remove(item);
-                            listBox2.DataSource = items;
-                            listBox2.DisplayMember = "tam_deger";
-                            label2.Text = $"Total: {items.Count}";
-                            kp3.form3_secilen_degeri_geri_yukle_1(item.id, items, trash_kutusu_dosya, trash_kutusu_bodyfile);
-                            kp3.form3_secilen_degeri_geri_yukle_2(item.id, items, trash_kutusu_dosya, trash_kutusu_bodyfile);
-                            kp3.form3_secilen_degeri_sil_3(item.id);
-
+                            if (button_no == 3)
+                            {
+                                var item = (trash_get_user)listBox2.SelectedValue;
+                                if (item.yollayan_kisi == login_user.Instance.Eposta)
+                                {
+                                    kp3.form3_secilen_degeri_geri_yukle_2(item.id, trash_kutusu, trash_kutusu_dosya, trash_kutusu_bodyfile);
+                                }
+                                else
+                                {
+                                    kp3.form3_secilen_degeri_geri_yukle_1(item.id, trash_kutusu, trash_kutusu_dosya, trash_kutusu_bodyfile);
+                                }
+                                listBox2.DataSource = null;
+                                kp3.form3_secilen_degeri_sil_3(item.id);
+                                trash_kutusu.Remove(item);
+                                listBox2.DataSource = trash_kutusu;
+                                listBox2.DisplayMember = "tam_deger";
+                                label2.Text = $"Total: {trash_kutusu.Count}";
+                            }
                         }
                     }
+                    catch (Exception ) { }
                     gelen_kutusu.Clear();
                     gelen_kutusu_bodyfile.Clear();
                     gelen_kutusu_dosya.Clear();
@@ -1197,9 +1318,15 @@ namespace mail
             }
         }
 
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            label1.Text = ("Mailler güncelleniyor  -  " + e.ProgressPercentage.ToString() + "%");
+        }
+
         private void button5_Click(object sender, EventArgs e)
         {
             button_no = 1;
+            label3.Text = "Gelen Kutusu:";
             label2.Text = $"Total: {gelen_kutusu.Count}";
             listBox2.DataSource = null;
             listBox2.DataSource = gelen_kutusu;

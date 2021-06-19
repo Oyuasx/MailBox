@@ -13,8 +13,8 @@ id int PRIMARY KEY IDENTITY(1,1),
 kisi_no int NOT NULL,
 yollayan_kisi varchar(100) NOT NULL,
 mail_alma_tarhi datetimeoffset NOT NULL default GETDATE(),
-alýnan_mail_konu varchar(1000) NOT NULL,
-alýnan_mail_icerik nvarchar(max) NOT NULL,
+alýnan_mail_konu varchar(1000) NULL,
+alýnan_mail_icerik nvarchar(max) NULL,
 )
 create table mail_get_user_dosyalar(		
 id int PRIMARY KEY IDENTITY(1,1),
@@ -35,8 +35,8 @@ create table mail_send_user(
 id int PRIMARY KEY IDENTITY(1,1),
 kisi_no int NOT NULL,
 mail_yollama_tarhi datetimeoffset NOT NULL default GETDATE(),
-gonderilen_mail_konu varchar(1000) NOT NULL,
-gonderilen_mail_icerik nvarchar(max) NOT NULL,
+gonderilen_mail_konu varchar(1000) NULL,
+gonderilen_mail_icerik nvarchar(max) NULL,
 )
 create table mail_send_user_dosyalar(
 id int PRIMARY KEY IDENTITY(1,1),
@@ -58,8 +58,8 @@ id int PRIMARY KEY IDENTITY(1,1),
 kisi_no int NOT NULL,
 yollayan_kisi varchar(100) NOT NULL,
 mail_alma_tarhi datetimeoffset NOT NULL default GETDATE(),
-alýnan_mail_konu varchar(1000) NOT NULL,
-alýnan_mail_icerik nvarchar(max) NOT NULL,
+alýnan_mail_konu varchar(1000) NULL,
+alýnan_mail_icerik nvarchar(max) NULL,
 )
 create table trash_get_user_dosyalar(		
 id int PRIMARY KEY IDENTITY(1,1),
@@ -76,5 +76,3 @@ alýnan_mail_bodyfile varbinary(max) NULL,
 width int NULL,
 height int NULL,
 )
-
-select * from trash_get_user

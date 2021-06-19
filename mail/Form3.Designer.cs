@@ -43,7 +43,7 @@ namespace mail
             this.label2 = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.textBox1 = new MailControlLibrary1.UserControl1();
+            this.label3 = new System.Windows.Forms.Label();
             this.textBox2 = new MailControlLibrary1.UserControl1();
             this.textBox3 = new MailControlLibrary1.UserControl1();
             this.button10 = new mail.UserControl2();
@@ -67,9 +67,9 @@ namespace mail
             this.listBox2.ForeColor = System.Drawing.Color.Black;
             this.listBox2.FormattingEnabled = true;
             this.listBox2.ItemHeight = 16;
-            this.listBox2.Location = new System.Drawing.Point(789, 195);
+            this.listBox2.Location = new System.Drawing.Point(789, 163);
             this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(414, 448);
+            this.listBox2.Size = new System.Drawing.Size(414, 480);
             this.listBox2.TabIndex = 13;
             // 
             // pictureBox2
@@ -117,6 +117,7 @@ namespace mail
             // 
             this.richTextBox1.BackColor = System.Drawing.Color.LightBlue;
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.richTextBox1.Location = new System.Drawing.Point(12, 168);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(771, 475);
@@ -140,6 +141,7 @@ namespace mail
             // backgroundWorker1
             // 
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
             // label1
@@ -185,7 +187,7 @@ namespace mail
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label2.Location = new System.Drawing.Point(808, 146);
+            this.label2.Location = new System.Drawing.Point(1119, 145);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(41, 13);
             this.label2.TabIndex = 36;
@@ -201,18 +203,17 @@ namespace mail
             this.listBox1.Size = new System.Drawing.Size(486, 104);
             this.listBox1.TabIndex = 50;
             // 
-            // textBox1
+            // label3
             // 
-            this.textBox1.BackColor = System.Drawing.Color.LightBlue;
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox1.BottomBorderColor = System.Drawing.Color.Black;
-            this.textBox1.BottomBorderFocusColor = System.Drawing.Color.Blue;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.textBox1.Location = new System.Drawing.Point(789, 178);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(300, 16);
-            this.textBox1.TabIndex = 53;
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.label3.AutoSize = true;
+            this.label3.BackColor = System.Drawing.Color.Transparent;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label3.ForeColor = System.Drawing.Color.Black;
+            this.label3.Location = new System.Drawing.Point(821, 135);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(70, 25);
+            this.label3.TabIndex = 53;
+            this.label3.Text = "label3";
             // 
             // textBox2
             // 
@@ -220,10 +221,10 @@ namespace mail
             this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox2.BottomBorderColor = System.Drawing.Color.Black;
             this.textBox2.BottomBorderFocusColor = System.Drawing.Color.Blue;
-            this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.textBox2.Location = new System.Drawing.Point(12, 145);
+            this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.textBox2.Location = new System.Drawing.Point(12, 148);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(346, 22);
+            this.textBox2.Size = new System.Drawing.Size(346, 20);
             this.textBox2.TabIndex = 52;
             // 
             // textBox3
@@ -232,10 +233,10 @@ namespace mail
             this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox3.BottomBorderColor = System.Drawing.Color.Black;
             this.textBox3.BottomBorderFocusColor = System.Drawing.Color.Blue;
-            this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.textBox3.Location = new System.Drawing.Point(359, 145);
+            this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.textBox3.Location = new System.Drawing.Point(359, 148);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(424, 22);
+            this.textBox3.Size = new System.Drawing.Size(424, 20);
             this.textBox3.TabIndex = 51;
             // 
             // button10
@@ -405,7 +406,7 @@ namespace mail
             this.BackColor = System.Drawing.Color.DeepSkyBlue;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(1225, 766);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.listBox1);
@@ -463,6 +464,6 @@ namespace mail
         private System.Windows.Forms.ListBox listBox1;
         private MailControlLibrary1.UserControl1 textBox3;
         private MailControlLibrary1.UserControl1 textBox2;
-        private MailControlLibrary1.UserControl1 textBox1;
+        private System.Windows.Forms.Label label3;
     }
 }
