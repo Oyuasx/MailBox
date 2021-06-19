@@ -247,12 +247,6 @@ namespace mail
 
 
 
-
-
-
-
-
-
         //Form3 kısmı
 
 

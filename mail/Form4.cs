@@ -108,8 +108,9 @@ namespace mail
                 client.Connect("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
                 client.Authenticate(login_user.Instance.Eposta, login_user.Instance.sifre);
                 bool hata_varmı = false;
+                bool loop = true;
                 rtf = richTextBox1.Rtf;
-                while (true)
+                while (loop)
                 {
                     try
                     {
@@ -147,7 +148,7 @@ namespace mail
                             string body = rtf.Substring(metinbaslangicIndex, richTextBox1.Rtf.Length - metinbaslangicIndex);
                             string html_body = markupConverter.ConvertRtfToHtml(body);
                             builder.HtmlBody += html_body;
-                            break;
+                            loop = false;
                         }
                     }
                     catch (Exception ht)
@@ -155,7 +156,7 @@ namespace mail
                         MessageBox.Show("Hata: " + ht);
                         string body = richTextBox1.Text;
                         builder.TextBody = body;
-                        break;
+                        loop = false;
                     }
                 }
                 bool empty = !attachment_dondur.Any();
