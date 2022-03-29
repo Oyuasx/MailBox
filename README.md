@@ -1,4 +1,4 @@
-# C# Mailbox Aplication
+# C# Mail Aplication
 
 C#'da Form application kullanılarak yapılan bir uygulamadır. Mail almayı ve yazmayı kolaylaştırmak amacıyla yapılıştır.
 
