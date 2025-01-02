@@ -1,4 +1,4 @@
-# Desktop Email Application - C# Mail Client
+# Desktop Email Application - C# Mail Application
 
 This project is a desktop email client developed in C# using Windows Forms, inspired by the built-in "Windows Mail" application. It allows users to send, delete, and organize emails into folders like Inbox, Spam, and Deleted Items. The application also provides functionality for sending emails with attachments, images, and custom text formatting.
 
@@ -57,4 +57,4 @@ For the full **HTML-to-Text conversion** code, please refer to the [Gist here](h
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/bugradaryal/CSharpMailClient.git
+   git clone https://github.com/bugradaryal/CSharpMailApplication.git
