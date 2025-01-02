@@ -57,4 +57,4 @@ For the full **HTML-to-Text conversion** code, please refer to the [Gist here](h
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/bugradaryal/DesktopEmailApplication-CSharpMailClient.git
+   git clone https://github.com/bugradaryal/CSharpMailClient.git
